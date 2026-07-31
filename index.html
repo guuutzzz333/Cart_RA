@@ -378,20 +378,24 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
       <div id="recentList"><div class="spinner"></div></div>
     </section>
 
-    <!-- GAMES -->
-    <section class="screen" id="screen-games">
+    <!-- BACKLOG -->
+    <section class="screen" id="screen-backlog">
       <div class="eyebrow">Your library</div>
-      <div id="gamesList"><div class="spinner"></div></div>
+      <div id="backlogList"><div class="spinner"></div></div>
     </section>
 
-    <!-- AWARDS -->
-    <section class="screen" id="screen-awards">
-      <div class="eyebrow">Site awards</div>
-      <div id="awardsGrid"><div class="spinner"></div></div>
+    <!-- CONSOLE (search) -->
+    <section class="screen" id="screen-console">
+      <div class="eyebrow">Search</div>
+      <div class="empty-state">
+        <div class="glyph">🔍</div>
+        Game search is coming in a later step.
+        <div class="hint">This tab is just holding its place for now.</div>
+      </div>
     </section>
 
-    <!-- SETTINGS -->
-    <section class="screen" id="screen-settings">
+    <!-- PROFILE -->
+    <section class="screen" id="screen-profile">
       <div class="eyebrow">Account</div>
       <div class="card">
         <label for="inUsername">RetroAchievements username</label>
@@ -407,6 +411,9 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 
         <button class="btn btn-primary" id="btnSaveSettings">Save & sync</button>
       </div>
+
+      <div class="eyebrow">Site awards</div>
+      <div id="awardsGrid"><div class="spinner"></div></div>
 
       <div class="eyebrow">Install</div>
       <div class="card">
@@ -427,17 +434,17 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
       Home
     </button>
-    <button class="tab" data-screen="games">
+    <button class="tab" data-screen="backlog">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 11v4M6 13h4M15 12h.01M18 14h.01"/></svg>
-      Games
+      Backlog
     </button>
-    <button class="tab" data-screen="awards">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 21l5-2.5L17 21l-1.5-8.5"/></svg>
-      Awards
+    <button class="tab" data-screen="console">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Console
     </button>
-    <button class="tab" data-screen="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-      Settings
+    <button class="tab" data-screen="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Profile
     </button>
   </nav>
 
@@ -586,33 +593,38 @@ const RA = (() => {
   const loaded = new Set();
   function loadScreen(name) {
     if (!RA.isConfigured()) {
-      if (name !== "settings") renderNeedsSetup(name);
+      if (name === "profile") {
+        $("#awardsGrid").innerHTML = `<div class="empty-state"><div class="glyph">🏅</div>Awards show up here once you're connected.</div>`;
+      } else {
+        renderNeedsSetup(name);
+      }
       return;
     }
     if (name === "home") return loadHome();
-    if (name === "games") return loadGames();
-    if (name === "awards") return loadAwards();
+    if (name === "backlog") return loadBacklog();
+    if (name === "profile") return loadAwards();
+    // "console" is a placeholder for now — nothing to load.
   }
 
   function renderNeedsSetup(name) {
-    const map = { home: "recentList", games: "gamesList", awards: "awardsGrid" };
+    const map = { home: "recentList", backlog: "backlogList" };
     const el = $("#" + map[name]);
     if (!el) return;
     el.innerHTML = `
       <div class="empty-state">
         <div class="glyph">🕹️</div>
         <div>Connect your RetroAchievements account to see this.</div>
-        <div class="hint">Settings → enter your username and web API key.</div>
+        <div class="hint">Profile tab → enter your username and web API key.</div>
       </div>`;
   }
 
   function errorBanner(err) {
     if (err.code === "NOT_CONFIGURED") return "";
     if (err.code === "CORS_BLOCKED") {
-      return `<div class="banner">Couldn't reach RetroAchievements directly — this is usually a browser CORS restriction, not a problem with your account. Deploy the included <code>proxy-worker.js</code> and add its URL in Settings, then try again.</div>`;
+      return `<div class="banner">Couldn't reach RetroAchievements directly — this is usually a browser CORS restriction, not a problem with your account. Deploy the included <code>proxy-worker.js</code> and add its URL in the Profile tab, then try again.</div>`;
     }
     if (err.code === "BAD_CREDENTIALS") {
-      return `<div class="banner">RetroAchievements rejected that username/API key. Double-check both in Settings.</div>`;
+      return `<div class="banner">RetroAchievements rejected that username/API key. Double-check both in the Profile tab.</div>`;
     }
     return `<div class="banner">Something went wrong loading this (${escapeHtml(err.message || "unknown error")}). Pull to refresh or try again shortly.</div>`;
   }
@@ -675,9 +687,9 @@ const RA = (() => {
   }
 
   // ---------- GAMES ----------
-  async function loadGames() {
+  async function loadBacklog() {
     const { username } = RA.getSettings();
-    const el = $("#gamesList");
+    const el = $("#backlogList");
     el.innerHTML = '<div class="spinner"></div>';
     try {
       const data = await RA.getUserCompletionProgress(username, 100);
@@ -944,7 +956,7 @@ const RA = (() => {
   // ---------- init ----------
   hydrateSettingsForm();
   if (!RA.isConfigured()) {
-    showScreen("settings");
+    showScreen("profile");
   } else {
     showScreen("home");
   }
