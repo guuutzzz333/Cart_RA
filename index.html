@@ -320,6 +320,35 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 .ach-row .desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .close-x { position: absolute; top: 14px; right: 14px; background: var(--surface-raised); border: 1px solid var(--border); color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; }
 
+.seg { display: flex; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 14px; }
+.seg button { flex: 1; background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 8px 0; border-radius: 6px; }
+.seg button.active { background: var(--surface-raised); color: var(--gold); }
+
+.info-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.info-row:last-child { border-bottom: none; }
+.info-row .k { width: 38%; flex: none; color: var(--text-muted); }
+.info-row .v { flex: 1; }
+
+.accordion { border: 1px solid var(--border); border-radius: 8px; margin-top: 16px; overflow: hidden; }
+.accordion summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-raised);
+}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary .chev { transition: transform .18s ease; color: var(--text-muted); }
+.accordion[open] summary .chev { transform: rotate(180deg); }
+.accordion .accordion-body { padding: 4px 12px 12px; }
+.hash-row { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); padding: 7px 0; border-bottom: 1px solid var(--border); word-break: break-all; }
+.hash-row:last-child { border-bottom: none; }
+.hash-row .hname { color: var(--text); display: block; margin-bottom: 2px; }
+
 .spinner {
   width: 22px; height: 22px; border-radius: 50%;
   border: 3px solid var(--border); border-top-color: var(--teal);
@@ -507,6 +536,8 @@ const RA = (() => {
     getUserAwards: (username) => call("API_GetUserAwards.php", { u: username }),
     getGameInfoAndUserProgress: (username, gameId) =>
       call("API_GetGameInfoAndUserProgress.php", { u: username, g: gameId }),
+    getGameExtended: (gameId) => call("API_GetGameExtended.php", { i: gameId }),
+    getGameHashes: (gameId) => call("API_GetGameHashes.php", { i: gameId }),
   };
 })();
 
@@ -688,6 +719,84 @@ const RA = (() => {
     }
   }
 
+  function formatReleaseDate(raw) {
+    if (!raw) return "";
+    const d = new Date(raw);
+    if (isNaN(d)) return raw;
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  }
+
+  function renderAchievementRows(achievements) {
+    if (!achievements.length) return '<div class="empty-state">No achievements listed.</div>';
+    return achievements
+      .map((a) => {
+        const earned = Boolean(pick(a, "DateEarned"));
+        const t = pick(a, "Title");
+        const d = pick(a, "Description");
+        const pts = pick(a, "Points") ?? 0;
+        const badge = pick(a, "BadgeName");
+        return `
+        <div class="ach-row">
+          <div class="badge-slot ${earned ? "" : "locked"}" style="background-image:url('${badgeUrl(badge, earned)}')"></div>
+          <div style="flex:1;min-width:0;">
+            <div class="title">${escapeHtml(t)}</div>
+            <div class="desc">${escapeHtml(d)}</div>
+          </div>
+          <span class="pts-pill">${pts}</span>
+        </div>`;
+      })
+      .join("");
+  }
+
+  function renderInfoRows(ext) {
+    const rows = [
+      ["Developer", pick(ext, "Developer")],
+      ["Publisher", pick(ext, "Publisher")],
+      ["Genre", pick(ext, "Genre")],
+      ["Released", formatReleaseDate(pick(ext, "Released"))],
+      ["Players", pick(ext, "NumDistinctPlayers") ? Number(pick(ext, "NumDistinctPlayers")).toLocaleString() : null],
+      ["Achievements", pick(ext, "NumAchievements")],
+    ].filter(([, v]) => v !== null && v !== undefined && v !== "");
+
+    if (!rows.length) return '<div class="empty-state">No game info available.</div>';
+    return rows
+      .map(([k, v]) => `<div class="info-row"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v)}</div></div>`)
+      .join("");
+  }
+
+  function renderHashesAccordion(gameId) {
+    return `
+      <details class="accordion" id="hashesAccordion" data-gameid="${gameId}" data-loaded="0">
+        <summary>Supported game hashes <span class="chev">▾</span></summary>
+        <div class="accordion-body" id="hashesBody">
+          <div class="field-help">Tap to load…</div>
+        </div>
+      </details>`;
+  }
+
+  async function loadHashesInto(gameId, bodyEl) {
+    bodyEl.innerHTML = '<div class="spinner" style="margin:10px auto;"></div>';
+    try {
+      const data = await RA.getGameHashes(gameId);
+      const list = pick(data, "Results") || (Array.isArray(data) ? data : []);
+      if (!list.length) {
+        bodyEl.innerHTML = '<div class="field-help">No hashes on file for this set.</div>';
+        return;
+      }
+      bodyEl.innerHTML = list
+        .map((h) => {
+          const name = pick(h, "Name") || "";
+          const md5 = pick(h, "MD5") || "";
+          const labels = pick(h, "Labels");
+          const labelStr = Array.isArray(labels) && labels.length ? ` · ${labels.join(", ")}` : "";
+          return `<div class="hash-row"><span class="hname">${escapeHtml(name)}${escapeHtml(labelStr)}</span>${escapeHtml(md5)}</div>`;
+        })
+        .join("");
+    } catch (err) {
+      bodyEl.innerHTML = errorBanner(err) || '<div class="field-help">Couldn\'t load hashes.</div>';
+    }
+  }
+
   async function openGameModal(gameId) {
     const { username } = RA.getSettings();
     const root = $("#modalRoot");
@@ -703,43 +812,62 @@ const RA = (() => {
     });
 
     try {
-      const data = await RA.getGameInfoAndUserProgress(username, gameId);
-      const title = pick(data, "Title");
-      const console_ = pick(data, "ConsoleName");
-      const achObj = pick(data, "Achievements") || {};
+      const [progress, ext] = await Promise.all([
+        RA.getGameInfoAndUserProgress(username, gameId),
+        RA.getGameExtended(gameId).catch(() => null),
+      ]);
+
+      const title = pick(progress, "Title");
+      const console_ = pick(progress, "ConsoleName");
+      const achObj = pick(progress, "Achievements") || {};
       const achievements = Object.values(achObj).sort((a, b) => {
         const ea = pick(a, "DateEarned") ? 1 : 0;
         const eb = pick(b, "DateEarned") ? 1 : 0;
         return eb - ea;
       });
 
-      const rows = achievements
-        .map((a) => {
-          const earned = Boolean(pick(a, "DateEarned"));
-          const t = pick(a, "Title");
-          const d = pick(a, "Description");
-          const pts = pick(a, "Points") ?? 0;
-          const badge = pick(a, "BadgeName");
-          return `
-          <div class="ach-row">
-            <div class="badge-slot ${earned ? "" : "locked"}" style="background-image:url('${badgeUrl(badge, earned)}')"></div>
-            <div style="flex:1;min-width:0;">
-              <div class="title">${escapeHtml(t)}</div>
-              <div class="desc">${escapeHtml(d)}</div>
-            </div>
-            <span class="pts-pill">${pts}</span>
-          </div>`;
-        })
-        .join("");
-
       $(".modal-sheet", root).innerHTML = `
         <div class="drag"></div>
         <button class="close-x" id="modalClose">✕</button>
         <div class="eyebrow" style="margin-top:0;">${escapeHtml(console_)}</div>
-        <div style="font-size:16px;font-weight:600;margin-bottom:10px;">${escapeHtml(title)}</div>
-        ${rows || '<div class="empty-state">No achievements listed.</div>'}
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(title)}</div>
+        <div class="seg">
+          <button class="tab-ach active" type="button">Achievements</button>
+          <button class="tab-info" type="button">Info</button>
+        </div>
+        <div id="paneAch">${renderAchievementRows(achievements)}</div>
+        <div id="paneInfo" style="display:none;">
+          ${renderInfoRows(ext || {})}
+          ${renderHashesAccordion(gameId)}
+        </div>
       `;
+
       $("#modalClose").addEventListener("click", () => (root.innerHTML = ""));
+
+      const btnAch = $(".tab-ach", root);
+      const btnInfo = $(".tab-info", root);
+      const paneAch = $("#paneAch", root);
+      const paneInfo = $("#paneInfo", root);
+      btnAch.addEventListener("click", () => {
+        btnAch.classList.add("active");
+        btnInfo.classList.remove("active");
+        paneAch.style.display = "";
+        paneInfo.style.display = "none";
+      });
+      btnInfo.addEventListener("click", () => {
+        btnInfo.classList.add("active");
+        btnAch.classList.remove("active");
+        paneInfo.style.display = "";
+        paneAch.style.display = "none";
+      });
+
+      const accordion = $("#hashesAccordion", root);
+      accordion.addEventListener("toggle", () => {
+        if (accordion.open && accordion.dataset.loaded === "0") {
+          accordion.dataset.loaded = "1";
+          loadHashesInto(gameId, $("#hashesBody", accordion));
+        }
+      });
     } catch (err) {
       $(".modal-sheet", root).innerHTML = `<div class="drag"></div>${errorBanner(err) || '<div class="empty-state">Couldn\'t load this game.</div>'}`;
     }
