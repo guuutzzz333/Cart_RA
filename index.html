@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Cart — RetroAchievements</title>
+<meta name="description" content="Your RetroAchievements progress, unlocks, and library as an installable app.">
+<meta name="theme-color" content="#0d0f14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="cart-slot" aria-hidden="true"></div>
+    <div class="wordmark pixel">CART<span>_RA</span></div>
+    <div class="points" id="topbarPoints"></div>
+  </header>
+
+  <main>
+
+    <!-- HOME -->
+    <section class="screen active" id="screen-home">
+      <div id="homeBanner"></div>
+      <div class="eyebrow">Recent unlocks</div>
+      <div id="recentList"><div class="spinner"></div></div>
+    </section>
+
+    <!-- GAMES -->
+    <section class="screen" id="screen-games">
+      <div class="eyebrow">Your library</div>
+      <div id="gamesList"><div class="spinner"></div></div>
+    </section>
+
+    <!-- AWARDS -->
+    <section class="screen" id="screen-awards">
+      <div class="eyebrow">Site awards</div>
+      <div id="awardsGrid"><div class="spinner"></div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <div class="eyebrow">Account</div>
+      <div class="card">
+        <label for="inUsername">RetroAchievements username</label>
+        <input type="text" id="inUsername" autocomplete="username" placeholder="e.g. xelnia">
+
+        <label for="inApiKey">Web API key</label>
+        <input type="password" id="inApiKey" autocomplete="off" placeholder="paste your key">
+        <div class="field-help">Find yours in your RA control panel, under "Keys". Never share it — it's stored only on this device.</div>
+
+        <label for="inProxy">CORS proxy URL (optional)</label>
+        <input type="text" id="inProxy" placeholder="https://your-proxy.workers.dev">
+        <div class="field-help">Only needed if unlocks fail to load. See "Why a proxy?" below for a ready-made one you can deploy in a minute.</div>
+
+        <button class="btn btn-primary" id="btnSaveSettings">Save & sync</button>
+      </div>
+
+      <div class="eyebrow">Install</div>
+      <div class="card">
+        <div class="field-help" id="installHelp">Add Cart to your home screen for one-tap access, its own icon, and offline app-shell loading — no browser tabs or address bar.</div>
+        <button class="btn btn-ghost" id="btnInstall" style="display:none;">Add to home screen</button>
+      </div>
+
+      <div class="eyebrow">Why a proxy?</div>
+      <div class="card field-help">
+        RetroAchievements' API doesn't reliably send the browser permission headers (CORS) that let a website call it directly. If your data won't load, deploy the tiny <code>proxy-worker.js</code> file included alongside this app to Cloudflare Workers (free tier), then paste its URL above. Everything still uses your own key — the proxy only forwards requests.
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-screen="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+      Home
+    </button>
+    <button class="tab" data-screen="games">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 11v4M6 13h4M15 12h.01M18 14h.01"/></svg>
+      Games
+    </button>
+    <button class="tab" data-screen="awards">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 21l5-2.5L17 21l-1.5-8.5"/></svg>
+      Awards
+    </button>
+    <button class="tab" data-screen="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      Settings
+    </button>
+  </nav>
+
+  <div id="modalRoot"></div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
