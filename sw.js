@@ -1,4 +1,4 @@
-const CACHE = "cart-shell-v2";
+const CACHE = "cart-shell-v3";
 const SHELL = [
   "./",
   "./index.html",
@@ -9,7 +9,20 @@ const SHELL = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(async (cache) => {
+      // cache.addAll() is all-or-nothing: one 404 (e.g. a mistyped icon
+      // filename) fails the whole install, which stops the service worker
+      // from ever activating — and Chrome requires an active service
+      // worker before it will offer "Add to Home screen". Cache each file
+      // independently instead, so a bad file just gets skipped.
+      const results = await Promise.allSettled(SHELL.map((url) => cache.add(url)));
+      results.forEach((r, i) => {
+        if (r.status === "rejected") {
+          console.warn("[sw] failed to cache", SHELL[i], r.reason);
+        }
+      });
+      return self.skipWaiting();
+    })
   );
 });
 
