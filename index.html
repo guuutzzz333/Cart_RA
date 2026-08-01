@@ -197,6 +197,15 @@ main {
 .xp-bar .fill.complete { background: repeating-linear-gradient(90deg, var(--gold) 0 6px, #d99e2f 6px 7px); }
 .game-info .pct { font-size: 10.5px; color: var(--text-muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
 
+/* Now playing */
+.now-playing { display: flex; gap: 12px; align-items: center; cursor: pointer; border-left: 3px solid var(--teal); }
+.now-playing:active { background: var(--surface-raised); }
+.now-playing .rp-msg { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.45; }
+
+/* Spotlight (featured locked achievement) */
+.spotlight-card { border-left-color: var(--teal); }
+.spotlight-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
+
 /* Awards grid */
 .awards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .award-tile { text-align: center; }
@@ -374,6 +383,8 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
     <!-- HOME -->
     <section class="screen active" id="screen-home">
       <div id="homeBanner"></div>
+      <div id="nowPlayingSlot"></div>
+      <div id="spotlightSlot"></div>
       <div class="eyebrow">Recent unlocks</div>
       <div id="recentList"><div class="spinner"></div></div>
     </section>
@@ -634,7 +645,11 @@ const RA = (() => {
     const { username } = RA.getSettings();
     const listEl = $("#recentList");
     const bannerEl = $("#homeBanner");
+    const nowPlayingEl = $("#nowPlayingSlot");
+    const spotlightEl = $("#spotlightSlot");
     bannerEl.innerHTML = "";
+    nowPlayingEl.innerHTML = "";
+    spotlightEl.innerHTML = "";
     listEl.innerHTML = '<div class="spinner"></div>';
 
     try {
@@ -644,6 +659,17 @@ const RA = (() => {
       ]);
 
       renderTopbar(profile);
+
+      const lastGameId = pick(profile, "LastGameID");
+      if (lastGameId) {
+        // Non-fatal: the rest of Home should still work if this fails.
+        RA.getGameInfoAndUserProgress(username, lastGameId)
+          .then((game) => {
+            renderNowPlaying(profile, game);
+            renderSpotlight(game);
+          })
+          .catch(() => {});
+      }
 
       if (!Array.isArray(recent) || recent.length === 0) {
         listEl.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last 24 hours.<div class="hint">Go earn one — it'll show up here.</div></div>`;
@@ -678,6 +704,65 @@ const RA = (() => {
         listEl.innerHTML = `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load your unlocks.</div>`;
       }
     }
+  }
+
+  function renderNowPlaying(profile, game) {
+    const rp = pick(profile, "RichPresenceMsg");
+    const title = pick(game, "Title");
+    if (!title) return;
+    const icon = RA.mediaUrl(pick(game, "ImageIcon"));
+    const console_ = pick(game, "ConsoleName");
+    $("#nowPlayingSlot").innerHTML = `
+      <div class="eyebrow" style="margin-top:4px;">Currently playing</div>
+      <div class="card now-playing anim-in" data-gameid="${pick(game, "ID")}">
+        <div class="game-icon" style="background-image:url('${icon}')"></div>
+        <div class="game-info">
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="console">${escapeHtml(console_)}</div>
+          ${rp ? `<div class="rp-msg">${escapeHtml(rp)}</div>` : ""}
+        </div>
+      </div>`;
+    $(".now-playing", $("#nowPlayingSlot")).addEventListener("click", (e) =>
+      openGameModal(e.currentTarget.dataset.gameid)
+    );
+  }
+
+  // Deterministic pick so the spotlight holds steady for the day instead
+  // of reshuffling on every visit.
+  function seededIndex(seedStr, n) {
+    let h = 0;
+    for (let i = 0; i < seedStr.length; i++) h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
+    return n ? h % n : 0;
+  }
+
+  function renderSpotlight(game) {
+    const achObj = pick(game, "Achievements") || {};
+    const locked = Object.values(achObj).filter((a) => !pick(a, "DateEarned"));
+    if (!locked.length) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const gameTitle = pick(game, "Title") || "";
+    const pickIdx = seededIndex(today + gameTitle, locked.length);
+    const a = locked[pickIdx];
+
+    const title = pick(a, "Title");
+    const desc = pick(a, "Description");
+    const pts = pick(a, "Points") ?? 0;
+    const badge = pick(a, "BadgeName");
+
+    $("#spotlightSlot").innerHTML = `
+      <div class="eyebrow">Today's spotlight</div>
+      <div class="card unlock-card spotlight-card anim-in">
+        <div class="badge-slot locked" style="background-image:url('${badgeUrl(badge, false)}')"></div>
+        <div class="unlock-meta">
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="game">${escapeHtml(gameTitle)}</div>
+          <div class="meta-row">
+            <span class="pts-pill">${pts} pts</span>
+          </div>
+          ${desc ? `<div class="spotlight-desc">${escapeHtml(desc)}</div>` : ""}
+        </div>
+      </div>`;
   }
 
   function renderTopbar(profile) {
