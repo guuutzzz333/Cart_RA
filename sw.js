@@ -1,4 +1,4 @@
-const CACHE = "cart-shell-v3";
+const CACHE = "cart-shell-v4";
 const SHELL = [
   "./",
   "./index.html",
