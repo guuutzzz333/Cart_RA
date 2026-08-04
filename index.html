@@ -203,10 +203,27 @@ main {
 .now-playing .rp-msg { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.45; }
 
 /* Spotlight (Achievement of the Week) */
-.spotlight-card { border-left-color: var(--teal); }
+.spotlight-card { border-left: 3px solid var(--teal); }
 .spotlight-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
 .spotlight-badge { display: flex; align-items: center; justify-content: center; font-size: 24px; }
 .spotlight-badge.locked { filter: none; opacity: 0.9; }
+.spotlight-game-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+}
+.spotlight-game-row:active { opacity: 0.8; }
+.spotlight-game-row .game-info { flex: 1; min-width: 0; }
+.spotlight-countdown {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  flex: none;
+}
 
 /* Award frames — applied to a .badge-slot or .game-icon to show a game's
    completion status, matching RetroAchievements' four tiers. All four
@@ -767,7 +784,20 @@ const RA = (() => {
     listEl.innerHTML = '<div class="spinner"></div>';
 
     RA.getAchievementOfTheWeek()
-      .then((aotw) => renderSpotlight(aotw, username))
+      .then(async (aotw) => {
+        const ach = pick(aotw, "Achievement");
+        const game = pick(aotw, "Game");
+        const gameId = game && pick(game, "ID");
+        let fullGame = null;
+        if (gameId) {
+          try {
+            fullGame = await RA.getGameInfoAndUserProgress(username, gameId);
+          } catch {
+            fullGame = null;
+          }
+        }
+        renderSpotlight(aotw, fullGame);
+      })
       .catch(() => {
         spotlightEl.innerHTML = "";
       });
@@ -854,7 +884,10 @@ const RA = (() => {
 
   // Real Achievement of the Week, from RetroAchievements' own site-wide pick
   // — the same one shown on their homepage, not something we're faking.
-  function renderSpotlight(aotw, username) {
+  // fullGame (from GetGameInfoAndUserProgress) supplies the real badge art,
+  // the game's box icon, and whether this account has already earned it —
+  // none of which API_GetAchievementOfTheWeek.php itself returns.
+  function renderSpotlight(aotw, fullGame) {
     const el = $("#spotlightSlot");
     const ach = pick(aotw, "Achievement");
     const game = pick(aotw, "Game");
@@ -864,40 +897,65 @@ const RA = (() => {
       return;
     }
 
+    const achId = String(pick(ach, "ID"));
     const title = pick(ach, "Title");
     const desc = pick(ach, "Description");
     const pts = pick(ach, "Points") ?? 0;
     const gameTitle = pick(game, "Title") || "";
     const consoleTitle = pick(console_, "Title") || "";
-    const totalPlayers = pick(aotw, "TotalPlayers");
-    const unlocksCount = pick(aotw, "UnlocksCount");
-    const unlocks = pick(aotw, "Unlocks") || [];
-    const alreadyEarned =
-      username && unlocks.some((u) => (pick(u, "User") || "").toLowerCase() === username.toLowerCase());
     const gameId = pick(game, "ID");
+
+    let badge = null;
+    let alreadyEarned = false;
+    let gameIcon = "";
+    if (fullGame) {
+      gameIcon = RA.mediaUrl(pick(fullGame, "ImageIcon"));
+      const achObj = pick(fullGame, "Achievements") || {};
+      const match = achObj[achId] || Object.values(achObj).find((a) => String(pick(a, "ID")) === achId);
+      if (match) {
+        badge = pick(match, "BadgeName");
+        alreadyEarned = Boolean(pick(match, "DateEarned"));
+      }
+    }
+
+    const startAt = pick(aotw, "StartAt");
+    let daysLeftText = "";
+    if (startAt) {
+      const start = new Date(startAt.replace(" ", "T") + (startAt.includes("Z") ? "" : "Z"));
+      const daysLeft = 7 - Math.floor((Date.now() - start.getTime()) / 86400000);
+      if (daysLeft > 0) daysLeftText = `Ends in ${daysLeft}d`;
+    }
+
+    const badgeInner = badge
+      ? `style="background-image:url('${badgeUrl(badge, alreadyEarned)}')"`
+      : "";
 
     el.innerHTML = `
       <div class="eyebrow">Achievement of the week</div>
-      <div class="card unlock-card spotlight-card anim-in" ${gameId ? `data-gameid="${gameId}"` : ""}>
-        <div class="badge-slot spotlight-badge ${alreadyEarned ? "" : "locked"}">🏵️</div>
-        <div class="unlock-meta">
-          <div class="title">${escapeHtml(title)}</div>
-          <div class="game">${escapeHtml(gameTitle)}${consoleTitle ? ` · ${escapeHtml(consoleTitle)}` : ""}</div>
-          <div class="meta-row">
-            <span class="pts-pill">${pts} pts</span>
-            ${alreadyEarned ? `<span class="time-ago">✓ you've got this one</span>` : ""}
+      <div class="card spotlight-card anim-in">
+        <div class="unlock-card" style="border:none;background:none;padding:0;margin:0;">
+          <div class="badge-slot spotlight-badge ${badge ? "" : "dummy-badge"} ${alreadyEarned ? "" : "locked"}" ${badgeInner}>${badge ? "" : "🏵️"}</div>
+          <div class="unlock-meta">
+            <div class="title">${escapeHtml(title)}</div>
+            ${desc ? `<div class="spotlight-desc">${escapeHtml(desc)}</div>` : ""}
+            <div class="meta-row">
+              <span class="pts-pill">${pts} pts</span>
+              ${alreadyEarned ? `<span class="time-ago">✓ you've got this one</span>` : ""}
+            </div>
           </div>
-          ${desc ? `<div class="spotlight-desc">${escapeHtml(desc)}</div>` : ""}
-          ${
-            totalPlayers || unlocksCount
-              ? `<div class="spotlight-desc">${Number(unlocksCount || 0).toLocaleString()} unlocks so far · ${Number(totalPlayers || 0).toLocaleString()} players this game</div>`
-              : ""
-          }
+        </div>
+        <div class="spotlight-game-row" ${gameId ? `data-gameid="${gameId}"` : ""}>
+          <div class="game-icon" style="background-image:url('${gameIcon}')"></div>
+          <div class="game-info">
+            <div class="title">${escapeHtml(gameTitle)}</div>
+            <div class="console">${escapeHtml(consoleTitle)}</div>
+          </div>
+          ${daysLeftText ? `<div class="spotlight-countdown">${escapeHtml(daysLeftText)}</div>` : ""}
         </div>
       </div>`;
 
     if (gameId) {
-      $(".spotlight-card", el).addEventListener("click", () => openGameModal(gameId));
+      $(".spotlight-game-row", el).addEventListener("click", () => openGameModal(gameId));
     }
   }
 
