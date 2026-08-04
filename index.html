@@ -224,30 +224,34 @@ main {
 
 /* Now playing — bigger, Athena-style: icon + [system / title] up top,
    a dashed rule, then an unlocked-count row with a percentage on the right. */
-.now-playing { display: block; cursor: pointer; padding: 16px; font-family: 'Pixelify Sans', monospace; }
+.now-playing { display: block; cursor: pointer; padding: 16px; }
 .now-playing:active { background: var(--surface-raised); }
-.now-playing-top { display: flex; gap: 14px; align-items: center; }
-.now-playing .game-icon { width: 60px; height: 60px; }
-.now-playing .console { font-size: 12px; }
-.now-playing .title { font-size: 19px; font-weight: 700; margin-top: 3px; }
+.media-header { display: flex; gap: 14px; align-items: center; }
+.media-header .game-icon { width: 60px; height: 60px; }
+.media-header .console { font-size: 12px; }
+.media-header .title { font-size: 19px; font-weight: 700; margin-top: 3px; }
 .dashed-rule { border: none; border-top: 2px dashed rgba(255,255,255,0.18); margin: 14px 0; }
 .stat-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .stat-row .stat-line { font-size: 13px; color: var(--text); }
-.stat-row .stat-pct { font-size: 15px; font-weight: 700; color: var(--gold); }
+.stat-row .stat-pct { font-size: 15px; font-weight: 700; color: var(--gold); font-family: 'IBM Plex Mono', monospace; }
 
 /* Spotlight (Achievement of the Week) */
-.spotlight-header { display: flex; align-items: baseline; justify-content: space-between; margin: 22px 0 10px; font-family: 'Pixelify Sans', monospace; }
+.spotlight-header { display: flex; align-items: baseline; justify-content: space-between; margin: 22px 0 10px; }
 .spotlight-header .eyebrow { margin: 0; }
 .spotlight-header .spotlight-countdown { font-size: 11px; color: var(--text-muted); }
-.spotlight-card { padding: 16px; cursor: pointer; font-family: 'Pixelify Sans', monospace; }
+.spotlight-card { padding: 16px; cursor: pointer; }
 .spotlight-card:active { background: var(--surface-raised); }
 .spotlight-body { display: flex; gap: 14px; align-items: flex-start; }
 .spotlight-title-muted { font-size: 12px; color: var(--text-muted); }
 .spotlight-desc-big { font-size: 17px; font-weight: 700; color: var(--text); margin-top: 5px; line-height: 1.35; }
 
-/* Badge cart — a reusable "cartridge" frame for a badge icon + its point
-   value, used anywhere a single achievement needs a self-contained look. */
+/* Badge cart — a reusable "cartridge" frame for a badge icon + its bottom
+   bar (points for a generic badge, or a tier abbreviation for a game
+   completion award). Used anywhere a single achievement needs a
+   self-contained look. Add a .cart-tier-* class for a completion tier;
+   leave it off for the plain generic gray cart. */
 .badge-cart {
+  position: relative;
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -273,14 +277,10 @@ main {
   letter-spacing: 0.5px;
 }
 
-/* Award frames — applied to a .badge-slot or .game-icon to show a game's
-   completion status, matching RetroAchievements' four tiers. All four
-   share one "recipe" (thick border + bright inset ring + outer glow) so
-   they read as one family — only the color and the mastered sparkle differ.
-     Bronze   = Beaten, Softcore  (save states / cheats allowed)
-     Silver   = Beaten, Hardcore  (no save states / cheats)
-     Gold     = Completed         (every achievement, softcore included)
-     Mastered = Mastered          (every achievement, hardcore only) */
+/* Award frames — applied to a .badge-slot or .game-icon (e.g. in the
+   Backlog list, where there isn't room for a full cart) to show a game's
+   completion status as a colored border. Same four tiers as the cart
+   system below, just the compact version for tight spaces. */
 .frame-bronze {
   border-width: 4px !important;
   border-color: #d9822b !important;
@@ -315,23 +315,7 @@ main {
     0 0 0 1px rgba(168,110,255,0.5),
     0 0 14px rgba(168,110,255,0.6);
 }
-.frame-mastered::before, .frame-mastered::after {
-  content: "✦";
-  position: absolute;
-  font-size: 9px;
-  line-height: 1;
-  color: #fff;
-  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
-  pointer-events: none;
-}
-/* Static fallback position (right on the border, not over the artwork)
-   for reduced-motion; the animation below overrides top/left in motion. */
-.frame-mastered::before { top: -6%; left: -6%; }
-.frame-mastered::after { top: 88%; left: 88%; opacity: 0.85; }
-@media (prefers-reduced-motion: no-preference) {
-  .frame-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
-  .frame-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
-}
+
 @keyframes sparkle-orbit {
   0%   { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
   8%   { opacity: 1; transform: scale(1.2); }
@@ -343,17 +327,78 @@ main {
   83%  { opacity: 1; transform: scale(1.2); }
   100% { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
 }
-.frame-label {
+/* Compact-frame sparkles (Backlog icons) reuse the same star + orbit as
+   the full cart version below, scoped to .frame-mastered only — bronze/
+   silver/gold stay plain in the compact form since there's little room. */
+.frame-mastered::before, .frame-mastered::after {
+  content: "✦";
+  position: absolute;
   font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
-  text-align: center;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
+  pointer-events: none;
 }
-.frame-label.bronze { color: #e3a463; }
-.frame-label.silver { color: #cfe3ec; }
-.frame-label.gold { color: #ffd77a; }
-.frame-label.mastered { color: #c9a3ff; }
+.frame-mastered::before { top: -6%; left: -6%; }
+.frame-mastered::after { top: 88%; left: 88%; opacity: 0.85; }
+@media (prefers-reduced-motion: no-preference) {
+  .frame-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
+  .frame-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
+}
+
+/* Full cartridge tiers — same cart shape and badge artwork throughout;
+   only the cart's own finish (border/glow) and its sparkles change.
+   Bronze/Silver/Gold: static glimmers. Mastered: the same glimmers, but
+   orbiting, to make the top tier read as distinctly more special. */
+.cart-tier-bronze, .cart-tier-silver, .cart-tier-gold, .cart-tier-mastered {
+  border-width: 3px;
+  border-style: solid;
+}
+.cart-tier-bronze {
+  border-color: #d9822b;
+  box-shadow: inset 0 0 0 1px #ffd9a3, 0 0 12px rgba(198, 111, 28, 0.55);
+}
+.cart-tier-silver {
+  border-color: #c4c8cf;
+  box-shadow: inset 0 0 0 1px #ffffff, 0 0 12px rgba(170, 180, 190, 0.55);
+}
+.cart-tier-gold {
+  border-color: #ffc72c;
+  box-shadow: inset 0 0 0 1px #fff2c4, 0 0 14px rgba(255, 179, 0, 0.65);
+}
+.cart-tier-mastered {
+  border-color: #1a0f26;
+  background: #150a1f;
+  box-shadow: inset 0 0 0 1px #4a2a6b, 0 0 14px rgba(168, 110, 255, 0.6);
+}
+.cart-tier-bronze::before, .cart-tier-bronze::after,
+.cart-tier-silver::before, .cart-tier-silver::after,
+.cart-tier-gold::before, .cart-tier-gold::after {
+  content: "✦";
+  position: absolute;
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.9);
+  pointer-events: none;
+}
+.cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before { top: 5%; right: 7%; }
+.cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after { bottom: 22%; left: 7%; font-size: 8px; opacity: 0.75; }
+.cart-tier-mastered::before, .cart-tier-mastered::after {
+  content: "✦";
+  position: absolute;
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
+  pointer-events: none;
+}
+.cart-tier-mastered::before { top: -4%; left: -4%; }
+.cart-tier-mastered::after { top: 90%; left: 90%; opacity: 0.85; }
+@media (prefers-reduced-motion: no-preference) {
+  .cart-tier-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
+  .cart-tier-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
+}
 
 .dummy-badge { display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--surface-raised); }
 
@@ -361,6 +406,9 @@ main {
 .awards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .award-tile { text-align: center; }
 .award-tile .badge-slot { width: 100%; height: auto; aspect-ratio: 1; margin: 0 auto; }
+.award-tile .badge-cart { width: 100%; padding: 6px; gap: 5px; }
+.award-tile .badge-cart-icon { width: 100%; height: auto; aspect-ratio: 1; }
+.award-tile .badge-cart-points { font-size: 9px; }
 .award-tile .label { font-size: 9.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.3; }
 
 /* Stat strip */
@@ -574,29 +622,8 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
         <button class="btn btn-primary" id="btnSaveSettings">Save & sync</button>
       </div>
 
-      <div class="eyebrow">Border preview (test — remove later)</div>
-      <div class="awards-grid" style="margin-bottom:4px;">
-        <div class="award-tile">
-          <div class="badge-slot dummy-badge frame-bronze">⛏️</div>
-          <div class="label">Minecraft</div>
-          <div class="frame-label bronze">Beaten</div>
-        </div>
-        <div class="award-tile">
-          <div class="badge-slot dummy-badge frame-silver">⛏️</div>
-          <div class="label">Minecraft</div>
-          <div class="frame-label silver">Beaten HC</div>
-        </div>
-        <div class="award-tile">
-          <div class="badge-slot dummy-badge frame-gold">⛏️</div>
-          <div class="label">Minecraft</div>
-          <div class="frame-label gold">Completed</div>
-        </div>
-        <div class="award-tile">
-          <div class="badge-slot dummy-badge frame-mastered">⛏️</div>
-          <div class="label">Minecraft</div>
-          <div class="frame-label mastered">Mastered</div>
-        </div>
-      </div>
+      <div class="eyebrow">Cart preview (test — remove later)</div>
+      <div class="awards-grid" id="cartPreviewGrid" style="margin-bottom:4px;"></div>
 
       <div class="eyebrow">Site awards</div>
       <div id="awardsGrid"><div class="spinner"></div></div>
@@ -926,7 +953,7 @@ const RA = (() => {
     $("#nowPlayingSlot").innerHTML = `
       <div class="eyebrow pixel" style="margin-top:4px;">Currently playing</div>
       <div class="card now-playing anim-in${bgClass}" data-gameid="${pick(game, "ID")}"${bgStyle}>
-        <div class="now-playing-top">
+        <div class="media-header">
           <div class="game-icon" style="background-image:url('${icon}')"></div>
           <div class="game-info">
             <div class="console">${escapeHtml(console_)}</div>
@@ -963,12 +990,16 @@ const RA = (() => {
     const desc = pick(ach, "Description");
     const pts = pick(ach, "Points") ?? 0;
     const gameId = pick(game, "ID");
+    const gameTitle = pick(game, "Title") || "";
+    const consoleTitle = pick(pick(aotw, "Console"), "Title") || "";
 
     let badge = null;
     let alreadyEarned = false;
     let shot = "";
+    let gameIcon = "";
     if (fullGame) {
       shot = RA.mediaUrl(pick(fullGame, "ImageIngame") || pick(fullGame, "ImageTitle"));
+      gameIcon = RA.mediaUrl(pick(fullGame, "ImageIcon"));
       const achObj = pick(fullGame, "Achievements") || {};
       const match = achObj[achId] || Object.values(achObj).find((a) => String(pick(a, "ID")) === achId);
       if (match) {
@@ -994,8 +1025,16 @@ const RA = (() => {
         ${daysLeftText ? `<span class="spotlight-countdown">${escapeHtml(daysLeftText)}</span>` : ""}
       </div>
       <div class="card spotlight-card anim-in${bgClass}" ${gameId ? `data-gameid="${gameId}"` : ""}${bgStyle}>
+        <div class="media-header">
+          <div class="game-icon" style="background-image:url('${gameIcon}')"></div>
+          <div class="game-info">
+            <div class="console">${escapeHtml(consoleTitle)}</div>
+            <div class="title">${escapeHtml(gameTitle)}</div>
+          </div>
+        </div>
+        <hr class="dashed-rule">
         <div class="spotlight-body">
-          ${badgeCartHTML(badge, pts, alreadyEarned)}
+          ${badgeCartHTML({ badgeName: badge, points: pts, earned: alreadyEarned })}
           <div class="unlock-meta">
             <div class="spotlight-title-muted">${escapeHtml(title)}</div>
             ${desc ? `<div class="spotlight-desc-big">${escapeHtml(desc)}</div>` : ""}
@@ -1010,14 +1049,25 @@ const RA = (() => {
   }
 
   // Reusable "badge cart" — a cartridge-style frame for a single
-  // achievement badge + its point value. badgeName may be null (falls
-  // back to a placeholder), earned toggles the locked/grayscale look.
-  function badgeCartHTML(badgeName, points, earned) {
-    const style = badgeName ? ` style="background-image:url('${badgeUrl(badgeName, earned)}')"` : "";
+  // achievement badge + its bottom bar. Pass either badgeName (an RA
+  // achievement badge id, resolved via badgeUrl()) or iconUrl (an
+  // already-complete image URL, e.g. an award's game icon — awards use a
+  // different path scheme than achievement badges, so they can't go
+  // through badgeUrl()). earned toggles the locked/grayscale look on the
+  // artwork. tier is null for the plain generic cart (shows points), or
+  // one of "bronze"/"silver"/"gold"/"mastered" for a completion award
+  // (shows the BSC/BHC/CMP/MST abbreviation instead, same styling as
+  // points — no per-tier text color, only the cart's own finish differs).
+  const TIER_LABELS = { bronze: "BSC", silver: "BHC", gold: "CMP", mastered: "MST" };
+  function badgeCartHTML({ badgeName = null, iconUrl = null, points = 0, earned = true, tier = null } = {}) {
+    const resolvedUrl = iconUrl || (badgeName ? badgeUrl(badgeName, earned) : "");
+    const style = resolvedUrl ? ` style="background-image:url('${resolvedUrl}')"` : "";
+    const tierClass = tier ? ` cart-tier-${tier}` : "";
+    const barText = tier ? TIER_LABELS[tier] : `${points} pts`;
     return `
-      <div class="badge-cart">
-        <div class="badge-cart-icon ${earned ? "" : "locked"} ${badgeName ? "" : "dummy-badge"}"${style}>${badgeName ? "" : "🏵️"}</div>
-        <div class="badge-cart-points">${points} pts</div>
+      <div class="badge-cart${tierClass}">
+        <div class="badge-cart-icon ${earned ? "" : "locked"} ${resolvedUrl ? "" : "dummy-badge"}"${style}>${resolvedUrl ? "" : "🏵️"}</div>
+        <div class="badge-cart-points pixel">${escapeHtml(barText)}</div>
       </div>`;
   }
 
@@ -1248,24 +1298,20 @@ const RA = (() => {
         .map((a, i) => {
           const awardType = (pick(a, "AwardType") || "").toLowerCase();
           const isHardcore = pick(a, "AwardDataExtra") === 1;
-          let frameClass = "";
-          let frameText = "";
-          let labelClass = "";
-          if (awardType === "mastery/completion") {
-            frameClass = isHardcore ? "frame-mastered" : "frame-gold";
-            frameText = isHardcore ? "Mastered" : "Completed";
-            labelClass = isHardcore ? "mastered" : "gold";
-          } else if (awardType === "game beaten") {
-            frameClass = isHardcore ? "frame-silver" : "frame-bronze";
-            frameText = isHardcore ? "Beaten HC" : "Beaten";
-            labelClass = isHardcore ? "silver" : "bronze";
-          }
-          const frameLabel = frameClass ? `<div class="frame-label ${labelClass}">${frameText}</div>` : "";
+          let tier = null;
+          if (awardType === "mastery/completion") tier = isHardcore ? "mastered" : "gold";
+          else if (awardType === "game beaten") tier = isHardcore ? "silver" : "bronze";
+
+          const icon = RA.mediaUrl(pick(a, "ImageIcon"));
+          const title = pick(a, "Title");
+          const body = tier
+            ? badgeCartHTML({ iconUrl: icon, earned: true, tier })
+            : `<div class="badge-slot" style="background-image:url('${icon}')"></div>`;
+
           return `
         <div class="award-tile anim-in" style="animation-delay:${i * 15}ms">
-          <div class="badge-slot ${frameClass}" style="background-image:url('${RA.mediaUrl(pick(a, "ImageIcon"))}')"></div>
-          <div class="label">${escapeHtml(pick(a, "Title"))}</div>
-          ${frameLabel}
+          ${body}
+          <div class="label">${escapeHtml(title)}</div>
         </div>`;
         })
         .join("")}</div>`;
@@ -1316,8 +1362,24 @@ const RA = (() => {
     });
   }
 
+  function renderCartPreview() {
+    const el = $("#cartPreviewGrid");
+    if (!el) return;
+    const tiers = [null, "bronze", "silver", "gold", "mastered"];
+    el.innerHTML = tiers
+      .map(
+        (tier) => `
+      <div class="award-tile">
+        ${badgeCartHTML({ points: 10, earned: true, tier })}
+        <div class="label">Minecraft</div>
+      </div>`
+      )
+      .join("");
+  }
+
   // ---------- init ----------
   hydrateSettingsForm();
+  renderCartPreview();
   if (!RA.isConfigured()) {
     showScreen("profile");
   } else {
