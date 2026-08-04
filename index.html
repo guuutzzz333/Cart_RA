@@ -136,6 +136,31 @@ main {
   overflow: hidden;
 }
 
+/* Athena-style backdrop: a grayscale in-game screenshot behind a card,
+   dimmed under a dark gradient so text stays readable on top. Set
+   --bg-shot to a url(...) and add this class to opt a card in. */
+.card-bg-shot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-shot);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1) brightness(0.5) contrast(1.08);
+  z-index: 0;
+}
+.card-bg-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13,15,20,0.55) 0%, rgba(13,15,20,0.88) 100%);
+  z-index: 0;
+}
+.card-bg-shot > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Unlock ticker — the signature element: a console-style achievement toast */
 .unlock-card {
   display: flex;
@@ -866,10 +891,13 @@ const RA = (() => {
     const title = pick(game, "Title");
     if (!title) return;
     const icon = RA.mediaUrl(pick(game, "ImageIcon"));
+    const shot = RA.mediaUrl(pick(game, "ImageIngame") || pick(game, "ImageTitle"));
     const console_ = pick(game, "ConsoleName");
+    const bgClass = shot ? " card-bg-shot" : "";
+    const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
     $("#nowPlayingSlot").innerHTML = `
       <div class="eyebrow" style="margin-top:4px;">Currently playing</div>
-      <div class="card now-playing anim-in" data-gameid="${pick(game, "ID")}">
+      <div class="card now-playing anim-in${bgClass}" data-gameid="${pick(game, "ID")}"${bgStyle}>
         <div class="game-icon" style="background-image:url('${icon}')"></div>
         <div class="game-info">
           <div class="title">${escapeHtml(title)}</div>
@@ -908,8 +936,10 @@ const RA = (() => {
     let badge = null;
     let alreadyEarned = false;
     let gameIcon = "";
+    let shot = "";
     if (fullGame) {
       gameIcon = RA.mediaUrl(pick(fullGame, "ImageIcon"));
+      shot = RA.mediaUrl(pick(fullGame, "ImageIngame") || pick(fullGame, "ImageTitle"));
       const achObj = pick(fullGame, "Achievements") || {};
       const match = achObj[achId] || Object.values(achObj).find((a) => String(pick(a, "ID")) === achId);
       if (match) {
@@ -929,10 +959,12 @@ const RA = (() => {
     const badgeInner = badge
       ? `style="background-image:url('${badgeUrl(badge, alreadyEarned)}')"`
       : "";
+    const bgClass = shot ? " card-bg-shot" : "";
+    const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
 
     el.innerHTML = `
       <div class="eyebrow">Achievement of the week</div>
-      <div class="card spotlight-card anim-in">
+      <div class="card spotlight-card anim-in${bgClass}"${bgStyle}>
         <div class="unlock-card" style="border:none;background:none;padding:0;margin:0;">
           <div class="badge-slot spotlight-badge ${badge ? "" : "dummy-badge"} ${alreadyEarned ? "" : "locked"}" ${badgeInner}>${badge ? "" : "🏵️"}</div>
           <div class="unlock-meta">
