@@ -209,8 +209,29 @@ main {
 .spotlight-badge.locked { filter: none; opacity: 0.9; }
 
 /* Award frames — applied to a .badge-slot or .game-icon to show a game's
-   completion status. Gold = Completed (softcore, all achievements).
-   Mastered = every achievement, hardcore only, no save states. */
+   completion status, matching RetroAchievements' four tiers. All four
+   share one "recipe" (thick border + bright inset ring + outer glow) so
+   they read as one family — only the color and the mastered sparkle differ.
+     Bronze   = Beaten, Softcore  (save states / cheats allowed)
+     Silver   = Beaten, Hardcore  (no save states / cheats)
+     Gold     = Completed         (every achievement, softcore included)
+     Mastered = Mastered          (every achievement, hardcore only) */
+.frame-bronze {
+  border-width: 4px !important;
+  border-color: #d9822b !important;
+  box-shadow:
+    inset 0 0 0 1.5px #ffd9a3,
+    0 0 0 1px rgba(217, 130, 43, 0.5),
+    0 0 14px rgba(198, 111, 28, 0.7);
+}
+.frame-silver {
+  border-width: 4px !important;
+  border-color: #b9d2dd !important;
+  box-shadow:
+    inset 0 0 0 1.5px #ffffff,
+    0 0 0 1px rgba(185, 210, 221, 0.55),
+    0 0 14px rgba(150, 190, 205, 0.7);
+}
 .frame-gold {
   border-width: 4px !important;
   border-color: #ffc72c !important;
@@ -221,29 +242,41 @@ main {
 }
 .frame-mastered {
   position: relative;
-  border-width: 3px !important;
+  border-width: 4px !important;
   border-color: #1a0f26 !important;
   background-color: #150a1f;
-  box-shadow: 0 0 0 1px rgba(168,110,255,0.5), 0 0 14px rgba(168,110,255,0.6);
+  box-shadow:
+    inset 0 0 0 1.5px #4a2a6b,
+    0 0 0 1px rgba(168,110,255,0.5),
+    0 0 14px rgba(168,110,255,0.6);
 }
 .frame-mastered::before, .frame-mastered::after {
-  content: "";
+  content: "✦";
   position: absolute;
-  width: 3px; height: 3px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 4px 1px rgba(255,255,255,0.95);
-  opacity: 0.85;
+  font-size: 9px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
+  pointer-events: none;
 }
-.frame-mastered::before { top: 8%; left: 12%; }
-.frame-mastered::after { bottom: 10%; right: 14%; }
+/* Static fallback position (right on the border, not over the artwork)
+   for reduced-motion; the animation below overrides top/left in motion. */
+.frame-mastered::before { top: -6%; left: -6%; }
+.frame-mastered::after { top: 88%; left: 88%; opacity: 0.85; }
 @media (prefers-reduced-motion: no-preference) {
-  .frame-mastered::before { animation: sparkle-twinkle 1.8s ease-in-out infinite; }
-  .frame-mastered::after { animation: sparkle-twinkle 1.8s ease-in-out infinite 0.7s; }
+  .frame-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
+  .frame-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
 }
-@keyframes sparkle-twinkle {
-  0%, 100% { opacity: 0.2; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.3); }
+@keyframes sparkle-orbit {
+  0%   { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
+  8%   { opacity: 1; transform: scale(1.2); }
+  25%  { top: -6%; left: 88%; opacity: 0.3; transform: scale(0.7); }
+  33%  { opacity: 1; transform: scale(1.2); }
+  50%  { top: 88%; left: 88%; opacity: 0.3; transform: scale(0.7); }
+  58%  { opacity: 1; transform: scale(1.2); }
+  75%  { top: 88%; left: -6%; opacity: 0.3; transform: scale(0.7); }
+  83%  { opacity: 1; transform: scale(1.2); }
+  100% { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
 }
 .frame-label {
   font-size: 9px;
@@ -252,8 +285,12 @@ main {
   margin-top: 4px;
   text-align: center;
 }
+.frame-label.bronze { color: #e3a463; }
+.frame-label.silver { color: #cfe3ec; }
 .frame-label.gold { color: #ffd77a; }
 .frame-label.mastered { color: #c9a3ff; }
+
+.dummy-badge { display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--surface-raised); }
 
 /* Awards grid */
 .awards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -472,6 +509,30 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
         <button class="btn btn-primary" id="btnSaveSettings">Save & sync</button>
       </div>
 
+      <div class="eyebrow">Border preview (test — remove later)</div>
+      <div class="awards-grid" style="margin-bottom:4px;">
+        <div class="award-tile">
+          <div class="badge-slot dummy-badge frame-bronze">⛏️</div>
+          <div class="label">Minecraft</div>
+          <div class="frame-label bronze">Beaten</div>
+        </div>
+        <div class="award-tile">
+          <div class="badge-slot dummy-badge frame-silver">⛏️</div>
+          <div class="label">Minecraft</div>
+          <div class="frame-label silver">Beaten HC</div>
+        </div>
+        <div class="award-tile">
+          <div class="badge-slot dummy-badge frame-gold">⛏️</div>
+          <div class="label">Minecraft</div>
+          <div class="frame-label gold">Completed</div>
+        </div>
+        <div class="award-tile">
+          <div class="badge-slot dummy-badge frame-mastered">⛏️</div>
+          <div class="label">Minecraft</div>
+          <div class="frame-label mastered">Mastered</div>
+        </div>
+      </div>
+
       <div class="eyebrow">Site awards</div>
       <div id="awardsGrid"><div class="spinner"></div></div>
 
@@ -539,4 +600,611 @@ const RA = (() => {
 
   function isConfigured() {
     const s = getSettings();
-    return Boolean(s.username && s.apiKey
+    return Boolean(s.username && s.apiKey);
+  }
+
+  function buildUrl(endpoint, params = {}) {
+    const s = getSettings();
+    const root = s.proxyUrl ? s.proxyUrl.replace(/\/$/, "") + "/" : BASE;
+    const url = new URL(root + endpoint);
+    url.searchParams.set("z", s.username || "");
+    url.searchParams.set("y", s.apiKey || "");
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, v);
+    }
+    return url.toString();
+  }
+
+  async function call(endpoint, params = {}) {
+    if (!isConfigured()) {
+      const err = new Error("NOT_CONFIGURED");
+      err.code = "NOT_CONFIGURED";
+      throw err;
+    }
+    const url = buildUrl(endpoint, params);
+    let res;
+    try {
+      res = await fetch(url, { headers: { Accept: "application/json" } });
+    } catch (networkErr) {
+      const err = new Error("CORS_BLOCKED");
+      err.code = "CORS_BLOCKED";
+      throw err;
+    }
+    if (res.status === 401 || res.status === 403) {
+      const err = new Error("BAD_CREDENTIALS");
+      err.code = "BAD_CREDENTIALS";
+      throw err;
+    }
+    if (!res.ok) {
+      const err = new Error("REQUEST_FAILED");
+      err.code = "REQUEST_FAILED";
+      err.status = res.status;
+      throw err;
+    }
+    return res.json();
+  }
+
+  // Badge/icon image helper — RA image paths are already absolute or root-relative.
+  function mediaUrl(path) {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return "https://media.retroachievements.org" + path;
+  }
+
+  return {
+    getSettings,
+    saveSettings,
+    isConfigured,
+    mediaUrl,
+    getUserProfile: (username) => call("API_GetUserProfile.php", { u: username }),
+    getUserRecentAchievements: (username, minutes = 1440) =>
+      call("API_GetUserRecentAchievements.php", { u: username, m: minutes }),
+    getUserCompletionProgress: (username, count = 100) =>
+      call("API_GetUserCompletionProgress.php", { u: username, c: count }),
+    getUserAwards: (username) => call("API_GetUserAwards.php", { u: username }),
+    getGameInfoAndUserProgress: (username, gameId) =>
+      call("API_GetGameInfoAndUserProgress.php", { u: username, g: gameId }),
+    getGameExtended: (gameId) => call("API_GetGameExtended.php", { i: gameId }),
+    getGameHashes: (gameId) => call("API_GetGameHashes.php", { i: gameId }),
+    getAchievementOfTheWeek: () => call("API_GetAchievementOfTheWeek.php"),
+    getAchievementOfTheWeek: () => call("API_GetAchievementOfTheWeek.php"),
+  };
+})();
+
+</script>
+<script>
+(() => {
+  "use strict";
+
+  // ---------- helpers ----------
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const pick = (obj, ...keys) => keys.map((k) => obj?.[k]).find((v) => v !== undefined && v !== null);
+  const escapeHtml = (s) =>
+    String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  function timeAgo(dateStr) {
+    if (!dateStr) return "";
+    const then = new Date(dateStr.replace(" ", "T") + (dateStr.includes("Z") ? "" : "Z"));
+    const diffMs = Date.now() - then.getTime();
+    const mins = Math.round(diffMs / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.round(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return then.toLocaleDateString();
+  }
+
+  function badgeUrl(badgeName, unlocked = true) {
+    if (!badgeName) return "";
+    const suffix = unlocked ? "" : "_lock";
+    return RA.mediaUrl(`/Badge/${badgeName}${suffix}.png`);
+  }
+
+  // ---------- tabs ----------
+  function showScreen(name) {
+    $$(".screen").forEach((s) => s.classList.toggle("active", s.id === `screen-${name}`));
+    $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.screen === name));
+    window.scrollTo(0, 0);
+    loadScreen(name);
+  }
+
+  $$(".tab").forEach((tab) => tab.addEventListener("click", () => showScreen(tab.dataset.screen)));
+
+  const loaded = new Set();
+  function loadScreen(name) {
+    if (!RA.isConfigured()) {
+      if (name === "profile") {
+        $("#awardsGrid").innerHTML = `<div class="empty-state"><div class="glyph">🏅</div>Awards show up here once you're connected.</div>`;
+      } else {
+        renderNeedsSetup(name);
+      }
+      return;
+    }
+    if (name === "home") return loadHome();
+    if (name === "backlog") return loadBacklog();
+    if (name === "profile") return loadAwards();
+    // "console" is a placeholder for now — nothing to load.
+  }
+
+  function renderNeedsSetup(name) {
+    const map = { home: "recentList", backlog: "backlogList" };
+    const el = $("#" + map[name]);
+    if (!el) return;
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="glyph">🕹️</div>
+        <div>Connect your RetroAchievements account to see this.</div>
+        <div class="hint">Profile tab → enter your username and web API key.</div>
+      </div>`;
+  }
+
+  function errorBanner(err) {
+    if (err.code === "NOT_CONFIGURED") return "";
+    if (err.code === "CORS_BLOCKED") {
+      return `<div class="banner">Couldn't reach RetroAchievements directly — this is usually a browser CORS restriction, not a problem with your account. Deploy the included <code>proxy-worker.js</code> and add its URL in the Profile tab, then try again.</div>`;
+    }
+    if (err.code === "BAD_CREDENTIALS") {
+      return `<div class="banner">RetroAchievements rejected that username/API key. Double-check both in the Profile tab.</div>`;
+    }
+    return `<div class="banner">Something went wrong loading this (${escapeHtml(err.message || "unknown error")}). Pull to refresh or try again shortly.</div>`;
+  }
+
+  // ---------- HOME ----------
+  const RECENT_CAP = 10;
+
+  async function loadHome() {
+    const { username } = RA.getSettings();
+    const listEl = $("#recentList");
+    const bannerEl = $("#homeBanner");
+    const nowPlayingEl = $("#nowPlayingSlot");
+    const spotlightEl = $("#spotlightSlot");
+    bannerEl.innerHTML = "";
+    nowPlayingEl.innerHTML = "";
+    spotlightEl.innerHTML = '<div class="eyebrow">Achievement of the week</div><div class="spinner"></div>';
+    listEl.innerHTML = '<div class="spinner"></div>';
+
+    RA.getAchievementOfTheWeek()
+      .then((aotw) => renderSpotlight(aotw, username))
+      .catch(() => {
+        spotlightEl.innerHTML = "";
+      });
+
+    try {
+      const [profile, recent] = await Promise.all([
+        RA.getUserProfile(username),
+        RA.getUserRecentAchievements(username, 1440),
+      ]);
+
+      renderTopbar(profile);
+
+      const lastGameId = pick(profile, "LastGameID");
+      if (lastGameId) {
+        // Non-fatal: the rest of Home should still work if this fails.
+        RA.getGameInfoAndUserProgress(username, lastGameId)
+          .then((game) => renderNowPlaying(profile, game))
+          .catch(() => {});
+      }
+
+      if (!Array.isArray(recent) || recent.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last 24 hours.<div class="hint">Go earn one — it'll show up here.</div></div>`;
+        return;
+      }
+
+      const shown = recent.slice(0, RECENT_CAP);
+      listEl.innerHTML = shown
+        .map((a, i) => {
+          const title = pick(a, "Title", "AchievementTitle");
+          const game = pick(a, "GameTitle");
+          const pts = pick(a, "Points") ?? 0;
+          const badge = pick(a, "BadgeName");
+          const date = pick(a, "Date", "DateEarned");
+          return `
+          <div class="card unlock-card anim-in" style="animation-delay:${i * 30}ms">
+            <div class="badge-slot" style="background-image:url('${badgeUrl(badge)}')"></div>
+            <div class="unlock-meta">
+              <div class="title">${escapeHtml(title)}</div>
+              <div class="game">${escapeHtml(game)}</div>
+              <div class="meta-row">
+                <span class="pts-pill">${pts} pts</span>
+                <span class="time-ago">${timeAgo(date)}</span>
+              </div>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      if (recent.length > RECENT_CAP) {
+        listEl.insertAdjacentHTML(
+          "beforeend",
+          `<div class="field-help" style="text-align:center;margin-top:2px;">+${recent.length - RECENT_CAP} more in the last 24h</div>`
+        );
+      }
+    } catch (err) {
+      listEl.innerHTML = "";
+      bannerEl.innerHTML = errorBanner(err);
+      if (err.code !== "NOT_CONFIGURED") {
+        listEl.innerHTML = `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load your unlocks.</div>`;
+      }
+    }
+  }
+
+  function renderNowPlaying(profile, game) {
+    const rp = pick(profile, "RichPresenceMsg");
+    const title = pick(game, "Title");
+    if (!title) return;
+    const icon = RA.mediaUrl(pick(game, "ImageIcon"));
+    const console_ = pick(game, "ConsoleName");
+    $("#nowPlayingSlot").innerHTML = `
+      <div class="eyebrow" style="margin-top:4px;">Currently playing</div>
+      <div class="card now-playing anim-in" data-gameid="${pick(game, "ID")}">
+        <div class="game-icon" style="background-image:url('${icon}')"></div>
+        <div class="game-info">
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="console">${escapeHtml(console_)}</div>
+          ${rp ? `<div class="rp-msg">${escapeHtml(rp)}</div>` : ""}
+        </div>
+      </div>`;
+    $(".now-playing", $("#nowPlayingSlot")).addEventListener("click", (e) =>
+      openGameModal(e.currentTarget.dataset.gameid)
+    );
+  }
+
+  // Real Achievement of the Week, from RetroAchievements' own site-wide pick
+  // — the same one shown on their homepage, not something we're faking.
+  function renderSpotlight(aotw, username) {
+    const el = $("#spotlightSlot");
+    const ach = pick(aotw, "Achievement");
+    const game = pick(aotw, "Game");
+    const console_ = pick(aotw, "Console");
+    if (!ach || !game) {
+      el.innerHTML = "";
+      return;
+    }
+
+    const title = pick(ach, "Title");
+    const desc = pick(ach, "Description");
+    const pts = pick(ach, "Points") ?? 0;
+    const gameTitle = pick(game, "Title") || "";
+    const consoleTitle = pick(console_, "Title") || "";
+    const totalPlayers = pick(aotw, "TotalPlayers");
+    const unlocksCount = pick(aotw, "UnlocksCount");
+    const unlocks = pick(aotw, "Unlocks") || [];
+    const alreadyEarned =
+      username && unlocks.some((u) => (pick(u, "User") || "").toLowerCase() === username.toLowerCase());
+    const gameId = pick(game, "ID");
+
+    el.innerHTML = `
+      <div class="eyebrow">Achievement of the week</div>
+      <div class="card unlock-card spotlight-card anim-in" ${gameId ? `data-gameid="${gameId}"` : ""}>
+        <div class="badge-slot spotlight-badge ${alreadyEarned ? "" : "locked"}">🏵️</div>
+        <div class="unlock-meta">
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="game">${escapeHtml(gameTitle)}${consoleTitle ? ` · ${escapeHtml(consoleTitle)}` : ""}</div>
+          <div class="meta-row">
+            <span class="pts-pill">${pts} pts</span>
+            ${alreadyEarned ? `<span class="time-ago">✓ you've got this one</span>` : ""}
+          </div>
+          ${desc ? `<div class="spotlight-desc">${escapeHtml(desc)}</div>` : ""}
+          ${
+            totalPlayers || unlocksCount
+              ? `<div class="spotlight-desc">${Number(unlocksCount || 0).toLocaleString()} unlocks so far · ${Number(totalPlayers || 0).toLocaleString()} players this game</div>`
+              : ""
+          }
+        </div>
+      </div>`;
+
+    if (gameId) {
+      $(".spotlight-card", el).addEventListener("click", () => openGameModal(gameId));
+    }
+  }
+
+  function renderTopbar(profile) {
+    if (!profile) return;
+    const pts = pick(profile, "TotalPoints") ?? 0;
+    $("#topbarPoints").innerHTML = `<span class="dot"></span>${Number(pts).toLocaleString()} pts`;
+  }
+
+  // ---------- GAMES ----------
+  async function loadBacklog() {
+    const { username } = RA.getSettings();
+    const el = $("#backlogList");
+    el.innerHTML = '<div class="spinner"></div>';
+    try {
+      const data = await RA.getUserCompletionProgress(username, 100);
+      const results = pick(data, "Results") || (Array.isArray(data) ? data : []);
+      if (!results.length) {
+        el.innerHTML = `<div class="empty-state"><div class="glyph">📼</div>No games played yet.</div>`;
+        return;
+      }
+      results.sort((a, b) => new Date(pick(b, "MostRecentAwardedDate") || 0) - new Date(pick(a, "MostRecentAwardedDate") || 0));
+
+      el.innerHTML = results
+        .map((g, i) => {
+          const title = pick(g, "Title");
+          const console_ = pick(g, "ConsoleName");
+          const icon = RA.mediaUrl(pick(g, "ImageIcon"));
+          const max = pick(g, "MaxPossible") || 0;
+          const got = pick(g, "NumAwarded") || 0;
+          const pct = max ? Math.round((got / max) * 100) : 0;
+          const complete = max > 0 && got >= max;
+          const gameId = pick(g, "GameID");
+          const awardKind = pick(g, "HighestAwardKind");
+          const frameClass =
+            awardKind === "mastered" ? "frame-mastered" :
+            awardKind === "completed" ? "frame-gold" :
+            awardKind === "beaten-hardcore" ? "frame-silver" :
+            awardKind === "beaten-softcore" ? "frame-bronze" : "";
+          return `
+          <div class="card game-card anim-in" style="animation-delay:${i * 20}ms" data-gameid="${gameId}">
+            <div class="game-icon ${frameClass}" style="background-image:url('${icon}')"></div>
+            <div class="game-info">
+              <div class="title">${escapeHtml(title)}</div>
+              <div class="console">${escapeHtml(console_)}</div>
+              <div class="xp-bar"><div class="fill ${complete ? "complete" : ""}" style="width:${pct}%"></div></div>
+              <div class="pct">${got}/${max} · ${pct}%</div>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      $$(".game-card", el).forEach((card) =>
+        card.addEventListener("click", () => openGameModal(card.dataset.gameid))
+      );
+    } catch (err) {
+      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load your library.</div>`;
+    }
+  }
+
+  function formatReleaseDate(raw) {
+    if (!raw) return "";
+    const d = new Date(raw);
+    if (isNaN(d)) return raw;
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  }
+
+  function renderAchievementRows(achievements) {
+    if (!achievements.length) return '<div class="empty-state">No achievements listed.</div>';
+    return achievements
+      .map((a) => {
+        const earned = Boolean(pick(a, "DateEarned"));
+        const t = pick(a, "Title");
+        const d = pick(a, "Description");
+        const pts = pick(a, "Points") ?? 0;
+        const badge = pick(a, "BadgeName");
+        return `
+        <div class="ach-row">
+          <div class="badge-slot ${earned ? "" : "locked"}" style="background-image:url('${badgeUrl(badge, earned)}')"></div>
+          <div style="flex:1;min-width:0;">
+            <div class="title">${escapeHtml(t)}</div>
+            <div class="desc">${escapeHtml(d)}</div>
+          </div>
+          <span class="pts-pill">${pts}</span>
+        </div>`;
+      })
+      .join("");
+  }
+
+  function renderInfoRows(ext) {
+    const rows = [
+      ["Developer", pick(ext, "Developer")],
+      ["Publisher", pick(ext, "Publisher")],
+      ["Genre", pick(ext, "Genre")],
+      ["Released", formatReleaseDate(pick(ext, "Released"))],
+      ["Players", pick(ext, "NumDistinctPlayers") ? Number(pick(ext, "NumDistinctPlayers")).toLocaleString() : null],
+      ["Achievements", pick(ext, "NumAchievements")],
+    ].filter(([, v]) => v !== null && v !== undefined && v !== "");
+
+    if (!rows.length) return '<div class="empty-state">No game info available.</div>';
+    return rows
+      .map(([k, v]) => `<div class="info-row"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v)}</div></div>`)
+      .join("");
+  }
+
+  function renderHashesAccordion(gameId) {
+    return `
+      <details class="accordion" id="hashesAccordion" data-gameid="${gameId}" data-loaded="0">
+        <summary>Supported game hashes <span class="chev">▾</span></summary>
+        <div class="accordion-body" id="hashesBody">
+          <div class="field-help">Tap to load…</div>
+        </div>
+      </details>`;
+  }
+
+  async function loadHashesInto(gameId, bodyEl) {
+    bodyEl.innerHTML = '<div class="spinner" style="margin:10px auto;"></div>';
+    try {
+      const data = await RA.getGameHashes(gameId);
+      const list = pick(data, "Results") || (Array.isArray(data) ? data : []);
+      if (!list.length) {
+        bodyEl.innerHTML = '<div class="field-help">No hashes on file for this set.</div>';
+        return;
+      }
+      bodyEl.innerHTML = list
+        .map((h) => {
+          const name = pick(h, "Name") || "";
+          const md5 = pick(h, "MD5") || "";
+          const labels = pick(h, "Labels");
+          const labelStr = Array.isArray(labels) && labels.length ? ` · ${labels.join(", ")}` : "";
+          return `<div class="hash-row"><span class="hname">${escapeHtml(name)}${escapeHtml(labelStr)}</span>${escapeHtml(md5)}</div>`;
+        })
+        .join("");
+    } catch (err) {
+      bodyEl.innerHTML = errorBanner(err) || '<div class="field-help">Couldn\'t load hashes.</div>';
+    }
+  }
+
+  async function openGameModal(gameId) {
+    const { username } = RA.getSettings();
+    const root = $("#modalRoot");
+    root.innerHTML = `
+      <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-sheet anim-pop">
+          <div class="drag"></div>
+          <div class="spinner"></div>
+        </div>
+      </div>`;
+    $("#modalBackdrop").addEventListener("click", (e) => {
+      if (e.target.id === "modalBackdrop") root.innerHTML = "";
+    });
+
+    try {
+      const [progress, ext] = await Promise.all([
+        RA.getGameInfoAndUserProgress(username, gameId),
+        RA.getGameExtended(gameId).catch(() => null),
+      ]);
+
+      const title = pick(progress, "Title");
+      const console_ = pick(progress, "ConsoleName");
+      const achObj = pick(progress, "Achievements") || {};
+      const achievements = Object.values(achObj).sort((a, b) => {
+        const ea = pick(a, "DateEarned") ? 1 : 0;
+        const eb = pick(b, "DateEarned") ? 1 : 0;
+        return eb - ea;
+      });
+
+      $(".modal-sheet", root).innerHTML = `
+        <div class="drag"></div>
+        <button class="close-x" id="modalClose">✕</button>
+        <div class="eyebrow" style="margin-top:0;">${escapeHtml(console_)}</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(title)}</div>
+        <div class="seg">
+          <button class="tab-ach active" type="button">Achievements</button>
+          <button class="tab-info" type="button">Info</button>
+        </div>
+        <div id="paneAch">${renderAchievementRows(achievements)}</div>
+        <div id="paneInfo" style="display:none;">
+          ${renderInfoRows(ext || {})}
+          ${renderHashesAccordion(gameId)}
+        </div>
+      `;
+
+      $("#modalClose").addEventListener("click", () => (root.innerHTML = ""));
+
+      const btnAch = $(".tab-ach", root);
+      const btnInfo = $(".tab-info", root);
+      const paneAch = $("#paneAch", root);
+      const paneInfo = $("#paneInfo", root);
+      btnAch.addEventListener("click", () => {
+        btnAch.classList.add("active");
+        btnInfo.classList.remove("active");
+        paneAch.style.display = "";
+        paneInfo.style.display = "none";
+      });
+      btnInfo.addEventListener("click", () => {
+        btnInfo.classList.add("active");
+        btnAch.classList.remove("active");
+        paneInfo.style.display = "";
+        paneAch.style.display = "none";
+      });
+
+      const accordion = $("#hashesAccordion", root);
+      accordion.addEventListener("toggle", () => {
+        if (accordion.open && accordion.dataset.loaded === "0") {
+          accordion.dataset.loaded = "1";
+          loadHashesInto(gameId, $("#hashesBody", accordion));
+        }
+      });
+    } catch (err) {
+      $(".modal-sheet", root).innerHTML = `<div class="drag"></div>${errorBanner(err) || '<div class="empty-state">Couldn\'t load this game.</div>'}`;
+    }
+  }
+
+  // ---------- AWARDS ----------
+  async function loadAwards() {
+    const { username } = RA.getSettings();
+    const el = $("#awardsGrid");
+    el.innerHTML = '<div class="spinner"></div>';
+    try {
+      const data = await RA.getUserAwards(username);
+      const list = pick(data, "VisibleUserAwards") || [];
+      if (!list.length) {
+        el.innerHTML = `<div class="empty-state"><div class="glyph">🎖️</div>No awards yet.</div>`;
+        return;
+      }
+      el.innerHTML = `<div class="awards-grid">${list
+        .map((a, i) => {
+          const awardType = (pick(a, "AwardType") || "").toLowerCase();
+          const isHardcore = pick(a, "AwardDataExtra") === 1;
+          let frameClass = "";
+          let frameText = "";
+          let labelClass = "";
+          if (awardType === "mastery/completion") {
+            frameClass = isHardcore ? "frame-mastered" : "frame-gold";
+            frameText = isHardcore ? "Mastered" : "Completed";
+            labelClass = isHardcore ? "mastered" : "gold";
+          } else if (awardType === "game beaten") {
+            frameClass = isHardcore ? "frame-silver" : "frame-bronze";
+            frameText = isHardcore ? "Beaten HC" : "Beaten";
+            labelClass = isHardcore ? "silver" : "bronze";
+          }
+          const frameLabel = frameClass ? `<div class="frame-label ${labelClass}">${frameText}</div>` : "";
+          return `
+        <div class="award-tile anim-in" style="animation-delay:${i * 15}ms">
+          <div class="badge-slot ${frameClass}" style="background-image:url('${RA.mediaUrl(pick(a, "ImageIcon"))}')"></div>
+          <div class="label">${escapeHtml(pick(a, "Title"))}</div>
+          ${frameLabel}
+        </div>`;
+        })
+        .join("")}</div>`;
+    } catch (err) {
+      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load awards.</div>`;
+    }
+  }
+
+  // ---------- SETTINGS ----------
+  function hydrateSettingsForm() {
+    const s = RA.getSettings();
+    $("#inUsername").value = s.username || "";
+    $("#inApiKey").value = s.apiKey || "";
+    $("#inProxy").value = s.proxyUrl || "";
+  }
+
+  $("#btnSaveSettings").addEventListener("click", () => {
+    const username = $("#inUsername").value.trim();
+    const apiKey = $("#inApiKey").value.trim();
+    const proxyUrl = $("#inProxy").value.trim();
+    RA.saveSettings({ username, apiKey, proxyUrl });
+    loaded.clear();
+    showScreen("home");
+  });
+
+  // ---------- Install prompt ----------
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = $("#btnInstall");
+    btn.style.display = "block";
+    btn.addEventListener("click", async () => {
+      btn.style.display = "none";
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    });
+  });
+  window.addEventListener("appinstalled", () => {
+    $("#installHelp").textContent = "Installed — you're all set. Launch Cart from your home screen.";
+  });
+
+  // ---------- Service worker ----------
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+
+  // ---------- init ----------
+  hydrateSettingsForm();
+  if (!RA.isConfigured()) {
+    showScreen("profile");
+  } else {
+    showScreen("home");
+  }
+})();
+
+</script>
+</body>
+</html>
