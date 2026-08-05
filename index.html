@@ -286,7 +286,7 @@ main {
   flex: 1;
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: #666a78;
   font-size: 11px;
   font-weight: 600;
   padding: 10px 4px;
@@ -350,6 +350,10 @@ main {
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 0.5px;
+  align-self: stretch;
+  text-align: center;
+  padding: 4px 6px;
+  border-radius: 6px;
 }
 
 /* Award frames — applied to a .badge-slot or .game-icon (e.g. in the
@@ -391,20 +395,9 @@ main {
     0 0 14px rgba(180, 185, 195, 0.5);
 }
 
-@keyframes sparkle-orbit {
-  0%   { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
-  8%   { opacity: 1; transform: scale(1.2); }
-  25%  { top: -6%; left: 88%; opacity: 0.3; transform: scale(0.7); }
-  33%  { opacity: 1; transform: scale(1.2); }
-  50%  { top: 88%; left: 88%; opacity: 0.3; transform: scale(0.7); }
-  58%  { opacity: 1; transform: scale(1.2); }
-  75%  { top: 88%; left: -6%; opacity: 0.3; transform: scale(0.7); }
-  83%  { opacity: 1; transform: scale(1.2); }
-  100% { top: -6%; left: -6%; opacity: 0.25; transform: scale(0.7); }
-}
-/* Compact-frame sparkles (Backlog icons) reuse the same star + orbit as
-   the full cart version below, scoped to .frame-mastered only — bronze/
-   silver/gold stay plain in the compact form since there's little room. */
+/* Compact-frame sparkles (Backlog icons), scoped to .frame-mastered only
+   — bronze/silver/gold stay plain in the compact form since there's
+   little room. Same smooth twinkle as the full cart version. */
 .frame-mastered::before, .frame-mastered::after {
   content: "✦";
   position: absolute;
@@ -413,66 +406,92 @@ main {
   color: #fff;
   text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(210,215,222,0.7);
   pointer-events: none;
+  opacity: 0.3;
 }
 .frame-mastered::before { top: -6%; left: -6%; }
-.frame-mastered::after { top: 88%; left: 88%; opacity: 0.85; }
+.frame-mastered::after { top: 88%; left: 88%; font-size: 8px; }
 @media (prefers-reduced-motion: no-preference) {
-  .frame-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
-  .frame-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
+  .frame-mastered::before { animation: sparkle-twinkle 2.6s ease-in-out infinite; }
+  .frame-mastered::after { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.3s; }
 }
 
 /* Full cartridge tiers — same cart shape and badge artwork throughout;
-   only the cart's own finish (border/glow) and its sparkles change.
-   Bronze/Silver/Gold: static glimmers. Mastered: the same glimmers, but
-   orbiting, to make the top tier read as distinctly more special. */
+   the cart's own finish (a real colored body, not just a border) and its
+   label color carry each tier's identity. All four share one smooth
+   twinkle animation — Mastered just gets more sparkle points, not motion,
+   to read as the most special without singling itself out mechanically. */
 .cart-tier-bronze, .cart-tier-silver, .cart-tier-gold, .cart-tier-mastered {
-  border-width: 3px;
+  border-width: 2px;
   border-style: solid;
 }
 .cart-tier-bronze {
-  border-color: #d9822b;
-  box-shadow: inset 0 0 0 1px #ffd9a3, 0 0 12px rgba(198, 111, 28, 0.55);
+  background: linear-gradient(155deg, #c9803f 0%, #8a5323 100%);
+  border-color: #6b3e18;
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 168, 0.4), 0 0 12px rgba(180, 105, 40, 0.5);
 }
+.cart-tier-bronze .badge-cart-points { background: #5f3717; color: #ffd9a3; }
 .cart-tier-silver {
-  border-color: #c4c8cf;
-  box-shadow: inset 0 0 0 1px #ffffff, 0 0 12px rgba(170, 180, 190, 0.55);
+  background: linear-gradient(155deg, #d7dce1 0%, #93999f 100%);
+  border-color: #6b7075;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 0 12px rgba(160, 170, 180, 0.5);
 }
+.cart-tier-silver .badge-cart-points { background: #4d5257; color: #eef2f5; }
 .cart-tier-gold {
-  border-color: #ffc72c;
-  box-shadow: inset 0 0 0 1px #fff2c4, 0 0 14px rgba(255, 179, 0, 0.65);
+  background: linear-gradient(155deg, #ffdd7a 0%, #c8931f 100%);
+  border-color: #93690f;
+  box-shadow: inset 0 0 0 1px rgba(255, 245, 210, 0.55), 0 0 14px rgba(255, 179, 0, 0.55);
 }
+.cart-tier-gold .badge-cart-points { background: #7a5711; color: #fff3c9; }
 .cart-tier-mastered {
-  border-color: #2a2c30;
-  background: #131416;
-  box-shadow: inset 0 0 0 1px #55585e, 0 0 14px rgba(180, 185, 195, 0.55);
+  background: linear-gradient(155deg, #35373c 0%, #131416 100%);
+  border-color: #0c0d0e;
+  box-shadow: inset 0 0 0 1px rgba(210, 215, 222, 0.3), 0 0 14px rgba(160, 165, 175, 0.4);
 }
+.cart-tier-mastered .badge-cart-points { background: #0e0f10; color: #d7d9dd; }
+
 .cart-tier-bronze::before, .cart-tier-bronze::after,
 .cart-tier-silver::before, .cart-tier-silver::after,
-.cart-tier-gold::before, .cart-tier-gold::after {
+.cart-tier-gold::before, .cart-tier-gold::after,
+.cart-tier-mastered::before, .cart-tier-mastered::after {
   content: "✦";
   position: absolute;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1;
   color: #fff;
   text-shadow: 0 0 3px rgba(255,255,255,0.9);
   pointer-events: none;
+  opacity: 0.3;
 }
-.cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before { top: 5%; right: 7%; }
-.cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after { bottom: 22%; left: 7%; font-size: 8px; opacity: 0.75; }
-.cart-tier-mastered::before, .cart-tier-mastered::after {
-  content: "✦";
-  position: absolute;
-  font-size: 11px;
-  line-height: 1;
-  color: #fff;
-  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(210,215,222,0.7);
-  pointer-events: none;
-}
-.cart-tier-mastered::before { top: -4%; left: -4%; }
-.cart-tier-mastered::after { top: 90%; left: 90%; opacity: 0.85; }
+.cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before,
+.cart-tier-mastered::before { top: 6%; right: 8%; }
+.cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after,
+.cart-tier-mastered::after { bottom: 24%; left: 8%; font-size: 8px; }
 @media (prefers-reduced-motion: no-preference) {
-  .cart-tier-mastered::before { animation: sparkle-orbit 4.4s linear infinite; }
-  .cart-tier-mastered::after { animation: sparkle-orbit 4.4s linear infinite -2.2s; }
+  .cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before,
+  .cart-tier-mastered::before { animation: sparkle-twinkle 2.6s ease-in-out infinite; }
+  .cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after,
+  .cart-tier-mastered::after { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.3s; }
+}
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+/* Mastered gets two extra sparkle points (real elements, not just its two
+   pseudo-elements) so it reads as having more glimmer than the other
+   tiers without being animated differently. */
+.cart-sparkle {
+  position: absolute;
+  font-size: 9px;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(255,255,255,0.9);
+  pointer-events: none;
+  opacity: 0.3;
+}
+.cart-sparkle.cs-1 { top: 42%; left: 6%; }
+.cart-sparkle.cs-2 { bottom: 6%; right: 12%; font-size: 8px; }
+@media (prefers-reduced-motion: no-preference) {
+  .cart-sparkle.cs-1 { animation: sparkle-twinkle 2.6s ease-in-out infinite -0.6s; }
+  .cart-sparkle.cs-2 { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.9s; }
 }
 
 .dummy-badge { display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--surface-raised); }
@@ -510,7 +529,27 @@ main {
 .reward-category-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 10px; }
 .reward-category-head .name { font-size: 13px; font-weight: 700; }
 .reward-category-head .expand-btn { background: none; border: none; color: var(--teal); font-size: 11px; font-weight: 600; padding: 4px 0; }
-.reward-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.reward-shelf {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 18px;
+}
+.reward-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.reward-grid .reward-tile { flex: 0 0 calc((100% - 30px) / 4); min-width: 0; scroll-snap-align: start; }
+.reward-grid.expanded {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: visible;
+}
+.reward-grid.expanded .reward-tile { flex: none; }
 .reward-tile { text-align: center; }
 .reward-tile .badge-cart { width: 100%; padding: 6px; gap: 5px; }
 .reward-tile .badge-cart-icon { width: 100%; height: auto; aspect-ratio: 1; }
@@ -1107,9 +1146,9 @@ const RA = (() => {
     const el = $("#pane-recentAch");
     el.innerHTML = '<div class="spinner"></div>';
     try {
-      const recent = await RA.getUserRecentAchievements(username, 1440);
+      const recent = await RA.getUserRecentAchievements(username, 10080);
       if (!Array.isArray(recent) || recent.length === 0) {
-        el.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last 24 hours.<div class="hint">Go earn one — it'll show up here.</div></div>`;
+        el.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last week.<div class="hint">Go earn one — it'll show up here.</div></div>`;
         return;
       }
       const shown = recent.slice(0, RECENT_CAP);
@@ -1139,12 +1178,30 @@ const RA = (() => {
       if (recent.length > RECENT_CAP) {
         el.insertAdjacentHTML(
           "beforeend",
-          `<div class="field-help" style="text-align:center;margin-top:2px;">+${recent.length - RECENT_CAP} more in the last 24h</div>`
+          `<div class="field-help" style="text-align:center;margin-top:2px;">+${recent.length - RECENT_CAP} more this week</div>`
         );
       }
     } catch (err) {
       el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load recent achievements.</div>`;
     }
+  }
+
+  // DEV ONLY: pad each category with placeholder rewards so scrolling and
+  // expansion can be tested before enough real completions exist. Remove
+  // this block (and the two padCategory calls below) before shipping.
+  const DEV_PAD_REWARDS = true;
+  function padCategory(items, tiers, labelPrefix) {
+    if (!DEV_PAD_REWARDS || items.length >= 7) return items;
+    const padded = items.slice();
+    let i = padded.length;
+    while (padded.length < 7) {
+      padded.push({
+        g: { GameID: `dev-${labelPrefix}-${i}`, Title: `${labelPrefix} Test Game ${i + 1}`, ImageIcon: "", MostRecentAwardedDate: null },
+        tier: tiers[i % tiers.length],
+      });
+      i++;
+    }
+    return padded;
   }
 
   async function loadRewardsPane() {
@@ -1156,8 +1213,8 @@ const RA = (() => {
       const data = await RA.getUserCompletionProgress(username, 200);
       const results = pick(data, "Results") || (Array.isArray(data) ? data : []);
 
-      const beaten = [];
-      const completed = [];
+      let beaten = [];
+      let completed = [];
       results.forEach((g) => {
         const kind = pick(g, "HighestAwardKind");
         if (kind === "beaten-softcore") beaten.push({ g, tier: "bronze" });
@@ -1170,28 +1227,27 @@ const RA = (() => {
       beaten.sort(byDate);
       completed.sort(byDate);
 
-      if (!beaten.length && !completed.length) {
+      if (!beaten.length && !completed.length && !DEV_PAD_REWARDS) {
         el.innerHTML = `<div class="empty-state"><div class="glyph">🏅</div>No game completions yet.<div class="hint">Beat or master a game — it'll show up here.</div></div>`;
         return;
       }
+
+      beaten = padCategory(beaten, ["bronze", "silver"], "Beaten");
+      completed = padCategory(completed, ["gold", "mastered"], "Completed");
 
       el.innerHTML =
         rewardCategoryHTML("Beaten Games", beaten, "beaten") +
         rewardCategoryHTML("Completed Games", completed, "completed");
 
       $$(".reward-grid", el).forEach((grid) => {
-        renderRewardGrid(grid, JSON.parse(grid.dataset.items), true);
+        renderRewardGrid(grid, JSON.parse(grid.dataset.items));
       });
 
       $$(".expand-btn", el).forEach((btn) =>
         btn.addEventListener("click", () => {
           const grid = $("#" + btn.dataset.target);
-          const wasExpanded = grid.dataset.expanded === "1";
-          grid.dataset.expanded = wasExpanded ? "0" : "1";
-          // wasExpanded doubles as the new collapsed flag: if it was
-          // expanded, we're now collapsing (collapsed=true), and vice versa.
-          renderRewardGrid(grid, JSON.parse(grid.dataset.items), wasExpanded);
-          btn.textContent = wasExpanded ? "Show all" : "Show less";
+          const nowExpanded = grid.classList.toggle("expanded");
+          btn.textContent = nowExpanded ? "Show less" : "Show all";
         })
       );
     } catch (err) {
@@ -1208,23 +1264,26 @@ const RA = (() => {
           <div class="name">${escapeHtml(name)} (${items.length})</div>
           ${items.length > 4 ? `<button class="expand-btn" data-target="${gridId}">Show all</button>` : ""}
         </div>
-        <div class="reward-grid" id="${gridId}" data-expanded="0" data-items='${escapeHtml(JSON.stringify(items.map((it) => ({ id: pick(it.g, "GameID"), title: pick(it.g, "Title"), icon: pick(it.g, "ImageIcon"), tier: it.tier }))))}'></div>
+        <div class="reward-shelf">
+          <div class="reward-grid" id="${gridId}" data-items='${escapeHtml(JSON.stringify(items.map((it) => ({ id: pick(it.g, "GameID"), title: pick(it.g, "Title"), icon: pick(it.g, "ImageIcon"), tier: it.tier }))))}'></div>
+        </div>
       </div>`;
   }
 
-  function renderRewardGrid(gridEl, items, collapsed) {
-    const shown = collapsed ? items.slice(0, 4) : items;
-    gridEl.innerHTML = shown
+  function renderRewardGrid(gridEl, items) {
+    gridEl.innerHTML = items
       .map(
         (it) => `
       <div class="reward-tile anim-in" data-gameid="${it.id}">
-        ${badgeCartHTML({ iconUrl: RA.mediaUrl(it.icon), earned: true, tier: it.tier })}
+        ${badgeCartHTML({ iconUrl: it.icon ? RA.mediaUrl(it.icon) : "", earned: true, tier: it.tier })}
         <div class="label">${escapeHtml(it.title)}</div>
       </div>`
       )
       .join("");
     $$(".reward-tile", gridEl).forEach((tile) =>
-      tile.addEventListener("click", () => openGameModal(tile.dataset.gameid))
+      tile.addEventListener("click", () => {
+        if (!String(tile.dataset.gameid).startsWith("dev-")) openGameModal(tile.dataset.gameid);
+      })
     );
   }
 
@@ -1356,8 +1415,11 @@ const RA = (() => {
     const style = resolvedUrl ? ` style="background-image:url('${resolvedUrl}')"` : "";
     const tierClass = tier ? ` cart-tier-${tier}` : "";
     const barText = tier ? TIER_LABELS[tier] : `${points} pts`;
+    const extraSparkles =
+      tier === "mastered" ? `<span class="cart-sparkle cs-1">✦</span><span class="cart-sparkle cs-2">✦</span>` : "";
     return `
       <div class="badge-cart${tierClass}">
+        ${extraSparkles}
         <div class="badge-cart-icon ${earned ? "" : "locked"} ${resolvedUrl ? "" : "dummy-badge"}"${style}>${resolvedUrl ? "" : "🏵️"}</div>
         <div class="badge-cart-points pixel">${escapeHtml(barText)}</div>
       </div>`;
