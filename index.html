@@ -161,6 +161,31 @@ main {
   z-index: 1;
 }
 
+/* Full-color variant — same trick, no grayscale, used for Currently
+   Playing so it reads as more prominent/alive than the grayscale
+   Achievement of the Week card. */
+.card-bg-shot-color::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-shot);
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.6) contrast(1.05) saturate(1.1);
+  z-index: 0;
+}
+.card-bg-shot-color::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13,15,20,0.35) 0%, rgba(13,15,20,0.82) 100%);
+  z-index: 0;
+}
+.card-bg-shot-color > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Unlock ticker — the signature element: a console-style achievement toast */
 .unlock-card {
   display: flex;
@@ -231,6 +256,56 @@ main {
 .media-header .console { font-size: 12px; }
 .media-header .title { font-size: 19px; font-weight: 700; margin-top: 3px; }
 .dashed-rule { border: none; border-top: 2px dashed rgba(255,255,255,0.18); margin: 14px 0; }
+
+/* Pill switcher — Home's Recently Played / Recent Achievements / Rewards
+   segmented control, with a sliding highlight behind the active tab. */
+.pill-switcher {
+  position: relative;
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  margin: 22px 0 16px;
+}
+.pill-switcher .pill-bg {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 3);
+  background: var(--surface-raised);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  z-index: 0;
+}
+.pill-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 4px;
+  border-radius: 999px;
+  text-align: center;
+  line-height: 1.25;
+}
+.pill-btn.active { color: var(--gold); }
+
+.seg-pane { display: none; }
+.seg-pane.active { display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  .seg-pane.active { animation: pane-slide-in 0.28s ease; }
+}
+@keyframes pane-slide-in {
+  from { opacity: 0; transform: translateX(var(--slide-from, 14px)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .stat-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .stat-row .stat-line { font-size: 13px; color: var(--text); }
 .stat-row .stat-pct { font-size: 15px; font-weight: 700; color: var(--gold); font-family: 'IBM Plex Mono', monospace; }
@@ -242,8 +317,8 @@ main {
 .spotlight-card { padding: 16px; cursor: pointer; }
 .spotlight-card:active { background: var(--surface-raised); }
 .spotlight-body { display: flex; gap: 14px; align-items: flex-start; }
-.spotlight-title-muted { font-size: 12px; color: var(--text-muted); }
-.spotlight-desc-big { font-size: 17px; font-weight: 700; color: var(--text); margin-top: 5px; line-height: 1.35; }
+.spotlight-title-muted { font-size: 12.5px; color: var(--text-muted); }
+.spotlight-desc-big { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 6px; line-height: 1.35; }
 
 /* Badge cart — a reusable "cartridge" frame for a badge icon + its bottom
    bar (points for a generic badge, or a tier abbreviation for a game
@@ -263,8 +338,8 @@ main {
   flex: none;
 }
 .badge-cart-icon {
-  width: 76px;
-  height: 76px;
+  width: 84px;
+  height: 84px;
   border-radius: 0;
   background: var(--bg) center/cover no-repeat;
   border: 1px solid var(--border);
@@ -308,12 +383,12 @@ main {
 .frame-mastered {
   position: relative;
   border-width: 4px !important;
-  border-color: #1a0f26 !important;
-  background-color: #150a1f;
+  border-color: #2a2c30 !important;
+  background-color: #131416;
   box-shadow:
-    inset 0 0 0 1.5px #4a2a6b,
-    0 0 0 1px rgba(168,110,255,0.5),
-    0 0 14px rgba(168,110,255,0.6);
+    inset 0 0 0 1.5px #55585e,
+    0 0 0 1px rgba(200, 205, 212, 0.35),
+    0 0 14px rgba(180, 185, 195, 0.5);
 }
 
 @keyframes sparkle-orbit {
@@ -336,7 +411,7 @@ main {
   font-size: 9px;
   line-height: 1;
   color: #fff;
-  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
+  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(210,215,222,0.7);
   pointer-events: none;
 }
 .frame-mastered::before { top: -6%; left: -6%; }
@@ -367,9 +442,9 @@ main {
   box-shadow: inset 0 0 0 1px #fff2c4, 0 0 14px rgba(255, 179, 0, 0.65);
 }
 .cart-tier-mastered {
-  border-color: #1a0f26;
-  background: #150a1f;
-  box-shadow: inset 0 0 0 1px #4a2a6b, 0 0 14px rgba(168, 110, 255, 0.6);
+  border-color: #2a2c30;
+  background: #131416;
+  box-shadow: inset 0 0 0 1px #55585e, 0 0 14px rgba(180, 185, 195, 0.55);
 }
 .cart-tier-bronze::before, .cart-tier-bronze::after,
 .cart-tier-silver::before, .cart-tier-silver::after,
@@ -390,7 +465,7 @@ main {
   font-size: 11px;
   line-height: 1;
   color: #fff;
-  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(190,140,255,0.7);
+  text-shadow: 0 0 3px rgba(255,255,255,0.95), 0 0 7px rgba(210,215,222,0.7);
   pointer-events: none;
 }
 .cart-tier-mastered::before { top: -4%; left: -4%; }
@@ -410,6 +485,37 @@ main {
 .award-tile .badge-cart-icon { width: 100%; height: auto; aspect-ratio: 1; }
 .award-tile .badge-cart-points { font-size: 9px; }
 .award-tile .label { font-size: 9.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.3; }
+
+/* Recently Played pane */
+.played-card { cursor: pointer; }
+.played-card:active { background: var(--surface-raised); }
+.played-card .media-header .game-icon { width: 52px; height: 52px; }
+.played-card .media-header .title { font-size: 15px; }
+.played-card .dashed-rule { margin: 11px 0; }
+.last-played-row { font-size: 12px; color: var(--text-muted); }
+.last-played-row .date { color: var(--text); font-weight: 600; }
+
+/* Recent Achievements pane */
+.rec-ach-card { display: flex; gap: 12px; align-items: flex-start; }
+.rec-ach-card .badge-cart { flex: none; }
+.rec-ach-card .badge-cart-icon { width: 60px; height: 60px; }
+.rec-ach-body { min-width: 0; flex: 1; }
+.rec-ach-body .title { font-size: 14px; font-weight: 700; }
+.rec-ach-body .desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+.rec-ach-body .dashed-rule { margin: 10px 0 8px; }
+.rec-ach-foot { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; color: var(--text-muted); }
+
+/* Rewards pane */
+.reward-category { margin-bottom: 6px; }
+.reward-category-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 10px; }
+.reward-category-head .name { font-size: 13px; font-weight: 700; }
+.reward-category-head .expand-btn { background: none; border: none; color: var(--teal); font-size: 11px; font-weight: 600; padding: 4px 0; }
+.reward-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.reward-tile { text-align: center; }
+.reward-tile .badge-cart { width: 100%; padding: 6px; gap: 5px; }
+.reward-tile .badge-cart-icon { width: 100%; height: auto; aspect-ratio: 1; }
+.reward-tile .badge-cart-points { font-size: 9px; }
+.reward-tile .label { font-size: 9.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.3; }
 
 /* Stat strip */
 .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -584,8 +690,18 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
       <div id="homeBanner"></div>
       <div id="nowPlayingSlot"></div>
       <div id="spotlightSlot"></div>
-      <div class="eyebrow">Recent unlocks</div>
-      <div id="recentList"><div class="spinner"></div></div>
+
+      <div class="pill-switcher" id="homePillSwitcher">
+        <div class="pill-bg" id="homePillBg"></div>
+        <button class="pill-btn active" data-pane="recentPlayed">Recently Played</button>
+        <button class="pill-btn" data-pane="recentAch">Recent Achievements</button>
+        <button class="pill-btn" data-pane="rewards">Rewards</button>
+      </div>
+      <div class="seg-panes">
+        <div class="seg-pane active" id="pane-recentPlayed"><div class="spinner"></div></div>
+        <div class="seg-pane" id="pane-recentAch"></div>
+        <div class="seg-pane" id="pane-rewards"></div>
+      </div>
     </section>
 
     <!-- BACKLOG -->
@@ -624,9 +740,6 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 
       <div class="eyebrow">Cart preview (test — remove later)</div>
       <div class="awards-grid" id="cartPreviewGrid" style="margin-bottom:4px;"></div>
-
-      <div class="eyebrow">Site awards</div>
-      <div id="awardsGrid"><div class="spinner"></div></div>
 
       <div class="eyebrow">Install</div>
       <div class="card">
@@ -759,7 +872,8 @@ const RA = (() => {
     getGameExtended: (gameId) => call("API_GetGameExtended.php", { i: gameId }),
     getGameHashes: (gameId) => call("API_GetGameHashes.php", { i: gameId }),
     getAchievementOfTheWeek: () => call("API_GetAchievementOfTheWeek.php"),
-    getAchievementOfTheWeek: () => call("API_GetAchievementOfTheWeek.php"),
+    getUserRecentlyPlayedGames: (username, count = 10) =>
+      call("API_GetUserRecentlyPlayedGames.php", { u: username, c: count }),
   };
 })();
 
@@ -808,21 +922,28 @@ const RA = (() => {
   const loaded = new Set();
   function loadScreen(name) {
     if (!RA.isConfigured()) {
-      if (name === "profile") {
-        $("#awardsGrid").innerHTML = `<div class="empty-state"><div class="glyph">🏅</div>Awards show up here once you're connected.</div>`;
-      } else {
-        renderNeedsSetup(name);
-      }
+      if (name !== "profile") renderNeedsSetup(name);
       return;
     }
     if (name === "home") return loadHome();
     if (name === "backlog") return loadBacklog();
-    if (name === "profile") return loadAwards();
     // "console" is a placeholder for now — nothing to load.
+    // "profile" needs no fetch beyond the settings form, which is
+    // hydrated once at startup.
   }
 
   function renderNeedsSetup(name) {
-    const map = { home: "recentList", backlog: "backlogList" };
+    if (name === "home") {
+      $("#homeBanner").innerHTML = `
+        <div class="empty-state">
+          <div class="glyph">🕹️</div>
+          <div>Connect your RetroAchievements account to see this.</div>
+          <div class="hint">Profile tab → enter your username and web API key.</div>
+        </div>`;
+      $$(".seg-pane").forEach((p) => (p.innerHTML = ""));
+      return;
+    }
+    const map = { backlog: "backlogList" };
     const el = $("#" + map[name]);
     if (!el) return;
     el.innerHTML = `
@@ -846,17 +967,19 @@ const RA = (() => {
 
   // ---------- HOME ----------
   const RECENT_CAP = 10;
+  let currentGameId = null; // set once we know the profile's LastGameID, so
+                             // Recently Played can exclude it.
 
   async function loadHome() {
     const { username } = RA.getSettings();
-    const listEl = $("#recentList");
     const bannerEl = $("#homeBanner");
     const nowPlayingEl = $("#nowPlayingSlot");
     const spotlightEl = $("#spotlightSlot");
     bannerEl.innerHTML = "";
     nowPlayingEl.innerHTML = "";
     spotlightEl.innerHTML = '<div class="eyebrow">Achievement of the week</div><div class="spinner"></div>';
-    listEl.innerHTML = '<div class="spinner"></div>';
+    currentGameId = null;
+    homePanesLoaded.clear();
 
     RA.getAchievementOfTheWeek()
       .then(async (aotw) => {
@@ -878,62 +1001,231 @@ const RA = (() => {
       });
 
     try {
-      const [profile, recent] = await Promise.all([
-        RA.getUserProfile(username),
-        RA.getUserRecentAchievements(username, 1440),
-      ]);
-
+      const profile = await RA.getUserProfile(username);
       renderTopbar(profile);
 
       const lastGameId = pick(profile, "LastGameID");
       if (lastGameId) {
+        currentGameId = String(lastGameId);
         // Non-fatal: the rest of Home should still work if this fails.
         RA.getGameInfoAndUserProgress(username, lastGameId)
           .then((game) => renderNowPlaying(profile, game))
           .catch(() => {});
       }
+    } catch (err) {
+      bannerEl.innerHTML = errorBanner(err);
+    }
 
-      if (!Array.isArray(recent) || recent.length === 0) {
-        listEl.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last 24 hours.<div class="hint">Go earn one — it'll show up here.</div></div>`;
+    // The default pane (Recently Played) loads right away; the other two
+    // load lazily the first time their tab is opened.
+    loadRecentPlayedPane();
+  }
+
+  const homePanesLoaded = new Set();
+  const HOME_PANES = ["recentPlayed", "recentAch", "rewards"];
+
+  function initPillSwitcher() {
+    const switcher = $("#homePillSwitcher");
+    if (!switcher || switcher.dataset.wired) return;
+    switcher.dataset.wired = "1";
+    $$(".pill-btn", switcher).forEach((btn, index) => {
+      btn.addEventListener("click", () => activateHomePane(btn.dataset.pane, index));
+    });
+  }
+
+  function activateHomePane(paneKey, index) {
+    const switcher = $("#homePillSwitcher");
+    const pillBg = $("#homePillBg");
+    const buttons = $$(".pill-btn", switcher);
+    const currentIndex = buttons.findIndex((b) => b.classList.contains("active"));
+    if (currentIndex === index) return;
+
+    buttons.forEach((b) => b.classList.remove("active"));
+    buttons[index].classList.add("active");
+    pillBg.style.transform = `translateX(${index * 100}%)`;
+
+    const slideFrom = index > currentIndex ? "14px" : "-14px";
+    $$(".seg-pane").forEach((p) => p.classList.remove("active"));
+    const pane = $("#pane-" + paneKey);
+    pane.style.setProperty("--slide-from", slideFrom);
+    pane.classList.add("active");
+
+    if (!homePanesLoaded.has(paneKey)) {
+      if (paneKey === "recentPlayed") loadRecentPlayedPane();
+      else if (paneKey === "recentAch") loadRecentAchPane();
+      else if (paneKey === "rewards") loadRewardsPane();
+    }
+  }
+
+  async function loadRecentPlayedPane() {
+    homePanesLoaded.add("recentPlayed");
+    const { username } = RA.getSettings();
+    const el = $("#pane-recentPlayed");
+    el.innerHTML = '<div class="spinner"></div>';
+    try {
+      const games = await RA.getUserRecentlyPlayedGames(username, 11);
+      const list = (Array.isArray(games) ? games : []).filter(
+        (g) => String(pick(g, "GameID")) !== currentGameId
+      );
+      const shown = list.slice(0, RECENT_CAP);
+      if (!shown.length) {
+        el.innerHTML = `<div class="empty-state"><div class="glyph">📼</div>Nothing else recent yet.</div>`;
         return;
       }
+      el.innerHTML = shown
+        .map((g, i) => {
+          const gameId = pick(g, "GameID");
+          const title = pick(g, "Title");
+          const console_ = pick(g, "ConsoleName");
+          const icon = RA.mediaUrl(pick(g, "ImageIcon"));
+          const lastPlayed = pick(g, "LastPlayed");
+          return `
+          <div class="card played-card anim-in" style="animation-delay:${i * 20}ms" data-gameid="${gameId}">
+            <div class="media-header">
+              <div class="game-icon" style="background-image:url('${icon}')"></div>
+              <div class="game-info">
+                <div class="console">${escapeHtml(console_)}</div>
+                <div class="title">${escapeHtml(title)}</div>
+              </div>
+            </div>
+            <hr class="dashed-rule">
+            <div class="last-played-row">Last played on <span class="date">${escapeHtml(formatReleaseDate(lastPlayed) || lastPlayed || "")}</span></div>
+          </div>`;
+        })
+        .join("");
+      $$(".played-card", el).forEach((card) =>
+        card.addEventListener("click", () => openGameModal(card.dataset.gameid))
+      );
+    } catch (err) {
+      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load recently played games.</div>`;
+    }
+  }
 
+  async function loadRecentAchPane() {
+    homePanesLoaded.add("recentAch");
+    const { username } = RA.getSettings();
+    const el = $("#pane-recentAch");
+    el.innerHTML = '<div class="spinner"></div>';
+    try {
+      const recent = await RA.getUserRecentAchievements(username, 1440);
+      if (!Array.isArray(recent) || recent.length === 0) {
+        el.innerHTML = `<div class="empty-state"><div class="glyph">🏆</div>No unlocks in the last 24 hours.<div class="hint">Go earn one — it'll show up here.</div></div>`;
+        return;
+      }
       const shown = recent.slice(0, RECENT_CAP);
-      listEl.innerHTML = shown
+      el.innerHTML = shown
         .map((a, i) => {
           const title = pick(a, "Title", "AchievementTitle");
+          const desc = pick(a, "Description");
           const game = pick(a, "GameTitle");
           const pts = pick(a, "Points") ?? 0;
           const badge = pick(a, "BadgeName");
           const date = pick(a, "Date", "DateEarned");
           return `
-          <div class="card unlock-card anim-in" style="animation-delay:${i * 30}ms">
-            <div class="badge-slot" style="background-image:url('${badgeUrl(badge)}')"></div>
-            <div class="unlock-meta">
+          <div class="card rec-ach-card anim-in" style="animation-delay:${i * 20}ms">
+            ${badgeCartHTML({ badgeName: badge, points: pts, earned: true })}
+            <div class="rec-ach-body">
               <div class="title">${escapeHtml(title)}</div>
-              <div class="game">${escapeHtml(game)}</div>
-              <div class="meta-row">
-                <span class="pts-pill">${pts} pts</span>
-                <span class="time-ago">${timeAgo(date)}</span>
+              ${desc ? `<div class="desc">${escapeHtml(desc)}</div>` : ""}
+              <hr class="dashed-rule">
+              <div class="rec-ach-foot">
+                <span>${escapeHtml(game)}</span>
+                <span>${escapeHtml(timeAgo(date))}</span>
               </div>
             </div>
           </div>`;
         })
         .join("");
-
       if (recent.length > RECENT_CAP) {
-        listEl.insertAdjacentHTML(
+        el.insertAdjacentHTML(
           "beforeend",
           `<div class="field-help" style="text-align:center;margin-top:2px;">+${recent.length - RECENT_CAP} more in the last 24h</div>`
         );
       }
     } catch (err) {
-      listEl.innerHTML = "";
-      bannerEl.innerHTML = errorBanner(err);
-      if (err.code !== "NOT_CONFIGURED") {
-        listEl.innerHTML = `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load your unlocks.</div>`;
-      }
+      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load recent achievements.</div>`;
     }
+  }
+
+  async function loadRewardsPane() {
+    homePanesLoaded.add("rewards");
+    const { username } = RA.getSettings();
+    const el = $("#pane-rewards");
+    el.innerHTML = '<div class="spinner"></div>';
+    try {
+      const data = await RA.getUserCompletionProgress(username, 200);
+      const results = pick(data, "Results") || (Array.isArray(data) ? data : []);
+
+      const beaten = [];
+      const completed = [];
+      results.forEach((g) => {
+        const kind = pick(g, "HighestAwardKind");
+        if (kind === "beaten-softcore") beaten.push({ g, tier: "bronze" });
+        else if (kind === "beaten-hardcore") beaten.push({ g, tier: "silver" });
+        else if (kind === "completed") completed.push({ g, tier: "gold" });
+        else if (kind === "mastered") completed.push({ g, tier: "mastered" });
+      });
+      // Newest first within each category.
+      const byDate = (a, b) => new Date(pick(b.g, "MostRecentAwardedDate") || 0) - new Date(pick(a.g, "MostRecentAwardedDate") || 0);
+      beaten.sort(byDate);
+      completed.sort(byDate);
+
+      if (!beaten.length && !completed.length) {
+        el.innerHTML = `<div class="empty-state"><div class="glyph">🏅</div>No game completions yet.<div class="hint">Beat or master a game — it'll show up here.</div></div>`;
+        return;
+      }
+
+      el.innerHTML =
+        rewardCategoryHTML("Beaten Games", beaten, "beaten") +
+        rewardCategoryHTML("Completed Games", completed, "completed");
+
+      $$(".reward-grid", el).forEach((grid) => {
+        renderRewardGrid(grid, JSON.parse(grid.dataset.items), true);
+      });
+
+      $$(".expand-btn", el).forEach((btn) =>
+        btn.addEventListener("click", () => {
+          const grid = $("#" + btn.dataset.target);
+          const wasExpanded = grid.dataset.expanded === "1";
+          grid.dataset.expanded = wasExpanded ? "0" : "1";
+          // wasExpanded doubles as the new collapsed flag: if it was
+          // expanded, we're now collapsing (collapsed=true), and vice versa.
+          renderRewardGrid(grid, JSON.parse(grid.dataset.items), wasExpanded);
+          btn.textContent = wasExpanded ? "Show all" : "Show less";
+        })
+      );
+    } catch (err) {
+      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load rewards.</div>`;
+    }
+  }
+
+  function rewardCategoryHTML(name, items, key) {
+    if (!items.length) return "";
+    const gridId = "rewardGrid-" + key;
+    return `
+      <div class="reward-category">
+        <div class="reward-category-head">
+          <div class="name">${escapeHtml(name)} (${items.length})</div>
+          ${items.length > 4 ? `<button class="expand-btn" data-target="${gridId}">Show all</button>` : ""}
+        </div>
+        <div class="reward-grid" id="${gridId}" data-expanded="0" data-items='${escapeHtml(JSON.stringify(items.map((it) => ({ id: pick(it.g, "GameID"), title: pick(it.g, "Title"), icon: pick(it.g, "ImageIcon"), tier: it.tier }))))}'></div>
+      </div>`;
+  }
+
+  function renderRewardGrid(gridEl, items, collapsed) {
+    const shown = collapsed ? items.slice(0, 4) : items;
+    gridEl.innerHTML = shown
+      .map(
+        (it) => `
+      <div class="reward-tile anim-in" data-gameid="${it.id}">
+        ${badgeCartHTML({ iconUrl: RA.mediaUrl(it.icon), earned: true, tier: it.tier })}
+        <div class="label">${escapeHtml(it.title)}</div>
+      </div>`
+      )
+      .join("");
+    $$(".reward-tile", gridEl).forEach((tile) =>
+      tile.addEventListener("click", () => openGameModal(tile.dataset.gameid))
+    );
   }
 
   function renderNowPlaying(profile, game) {
@@ -942,7 +1234,7 @@ const RA = (() => {
     const icon = RA.mediaUrl(pick(game, "ImageIcon"));
     const shot = RA.mediaUrl(pick(game, "ImageIngame") || pick(game, "ImageTitle"));
     const console_ = pick(game, "ConsoleName");
-    const bgClass = shot ? " card-bg-shot" : "";
+    const bgClass = shot ? " card-bg-shot-color" : "";
     const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
 
     const achObj = pick(game, "Achievements") || {};
@@ -1282,44 +1574,6 @@ const RA = (() => {
     }
   }
 
-  // ---------- AWARDS ----------
-  async function loadAwards() {
-    const { username } = RA.getSettings();
-    const el = $("#awardsGrid");
-    el.innerHTML = '<div class="spinner"></div>';
-    try {
-      const data = await RA.getUserAwards(username);
-      const list = pick(data, "VisibleUserAwards") || [];
-      if (!list.length) {
-        el.innerHTML = `<div class="empty-state"><div class="glyph">🎖️</div>No awards yet.</div>`;
-        return;
-      }
-      el.innerHTML = `<div class="awards-grid">${list
-        .map((a, i) => {
-          const awardType = (pick(a, "AwardType") || "").toLowerCase();
-          const isHardcore = pick(a, "AwardDataExtra") === 1;
-          let tier = null;
-          if (awardType === "mastery/completion") tier = isHardcore ? "mastered" : "gold";
-          else if (awardType === "game beaten") tier = isHardcore ? "silver" : "bronze";
-
-          const icon = RA.mediaUrl(pick(a, "ImageIcon"));
-          const title = pick(a, "Title");
-          const body = tier
-            ? badgeCartHTML({ iconUrl: icon, earned: true, tier })
-            : `<div class="badge-slot" style="background-image:url('${icon}')"></div>`;
-
-          return `
-        <div class="award-tile anim-in" style="animation-delay:${i * 15}ms">
-          ${body}
-          <div class="label">${escapeHtml(title)}</div>
-        </div>`;
-        })
-        .join("")}</div>`;
-    } catch (err) {
-      el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load awards.</div>`;
-    }
-  }
-
   // ---------- SETTINGS ----------
   function hydrateSettingsForm() {
     const s = RA.getSettings();
@@ -1380,6 +1634,7 @@ const RA = (() => {
   // ---------- init ----------
   hydrateSettingsForm();
   renderCartPreview();
+  initPillSwitcher();
   if (!RA.isConfigured()) {
     showScreen("profile");
   } else {
