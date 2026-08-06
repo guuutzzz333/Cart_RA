@@ -324,11 +324,13 @@ main {
    bar (points for a generic badge, or a tier abbreviation for a game
    completion award). Used anywhere a single achievement needs a
    self-contained look. Add a .cart-tier-* class for a completion tier;
-   leave it off for the plain generic gray cart. */
+   leave it off for the plain generic gray cart, which has its own
+   locked/unlocked look (grayscale art + gray pill vs. color art + a dark
+   high-contrast pill) driven by the .locked modifier. */
 .badge-cart {
   position: relative;
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
+  background: #5a5d64;
+  border: 2px solid #3a3c42;
   border-radius: 10px;
   padding: 10px;
   display: flex;
@@ -344,16 +346,21 @@ main {
   background: var(--bg) center/cover no-repeat;
   border: 1px solid var(--border);
 }
-.badge-cart-icon.locked { filter: grayscale(1) brightness(0.55); }
+.badge-cart-icon.locked { filter: grayscale(1) brightness(0.6); }
 .badge-cart-points {
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-muted);
   letter-spacing: 0.5px;
   align-self: stretch;
   text-align: center;
   padding: 4px 6px;
   border-radius: 6px;
+  background: #17181a;
+  color: #f2f3f5;
+}
+.badge-cart.locked .badge-cart-points {
+  background: #45474d;
+  color: #83868d;
 }
 
 /* Award frames — applied to a .badge-slot or .game-icon (e.g. in the
@@ -363,36 +370,24 @@ main {
 .frame-bronze {
   border-width: 4px !important;
   border-color: #d9822b !important;
-  box-shadow:
-    inset 0 0 0 1.5px #ffd9a3,
-    0 0 0 1px rgba(217, 130, 43, 0.5),
-    0 0 14px rgba(198, 111, 28, 0.7);
+  box-shadow: inset 0 0 0 1.5px #ffd9a3;
 }
 .frame-silver {
   border-width: 4px !important;
   border-color: #b9d2dd !important;
-  box-shadow:
-    inset 0 0 0 1.5px #ffffff,
-    0 0 0 1px rgba(185, 210, 221, 0.55),
-    0 0 14px rgba(150, 190, 205, 0.7);
+  box-shadow: inset 0 0 0 1.5px #ffffff;
 }
 .frame-gold {
   border-width: 4px !important;
   border-color: #ffc72c !important;
-  box-shadow:
-    inset 0 0 0 1.5px #fff2c4,
-    0 0 0 1px rgba(255, 199, 44, 0.5),
-    0 0 14px rgba(255, 179, 0, 0.75);
+  box-shadow: inset 0 0 0 1.5px #fff2c4;
 }
 .frame-mastered {
   position: relative;
   border-width: 4px !important;
   border-color: #2a2c30 !important;
   background-color: #131416;
-  box-shadow:
-    inset 0 0 0 1.5px #55585e,
-    0 0 0 1px rgba(200, 205, 212, 0.35),
-    0 0 14px rgba(180, 185, 195, 0.5);
+  box-shadow: inset 0 0 0 1.5px #55585e;
 }
 
 /* Compact-frame sparkles (Backlog icons), scoped to .frame-mastered only
@@ -427,32 +422,31 @@ main {
 .cart-tier-bronze {
   background: linear-gradient(155deg, #c9803f 0%, #8a5323 100%);
   border-color: #6b3e18;
-  box-shadow: inset 0 0 0 1px rgba(255, 214, 168, 0.4), 0 0 12px rgba(180, 105, 40, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 168, 0.4);
 }
 .cart-tier-bronze .badge-cart-points { background: #5f3717; color: #ffd9a3; }
 .cart-tier-silver {
   background: linear-gradient(155deg, #d7dce1 0%, #93999f 100%);
   border-color: #6b7075;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 0 12px rgba(160, 170, 180, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
 }
 .cart-tier-silver .badge-cart-points { background: #4d5257; color: #eef2f5; }
 .cart-tier-gold {
   background: linear-gradient(155deg, #ffdd7a 0%, #c8931f 100%);
   border-color: #93690f;
-  box-shadow: inset 0 0 0 1px rgba(255, 245, 210, 0.55), 0 0 14px rgba(255, 179, 0, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 245, 210, 0.55);
 }
 .cart-tier-gold .badge-cart-points { background: #7a5711; color: #fff3c9; }
 .cart-tier-mastered {
   background: linear-gradient(155deg, #35373c 0%, #131416 100%);
   border-color: #0c0d0e;
-  box-shadow: inset 0 0 0 1px rgba(210, 215, 222, 0.3), 0 0 14px rgba(160, 165, 175, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(210, 215, 222, 0.3);
 }
 .cart-tier-mastered .badge-cart-points { background: #0e0f10; color: #d7d9dd; }
 
 .cart-tier-bronze::before, .cart-tier-bronze::after,
 .cart-tier-silver::before, .cart-tier-silver::after,
-.cart-tier-gold::before, .cart-tier-gold::after,
-.cart-tier-mastered::before, .cart-tier-mastered::after {
+.cart-tier-gold::before, .cart-tier-gold::after {
   content: "✦";
   position: absolute;
   font-size: 10px;
@@ -462,23 +456,24 @@ main {
   pointer-events: none;
   opacity: 0.3;
 }
-.cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before,
-.cart-tier-mastered::before { top: 6%; right: 8%; }
-.cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after,
-.cart-tier-mastered::after { bottom: 24%; left: 8%; font-size: 8px; }
+.cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before { top: 6%; right: 8%; }
+.cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after { bottom: 24%; left: 8%; font-size: 8px; }
 @media (prefers-reduced-motion: no-preference) {
-  .cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before,
-  .cart-tier-mastered::before { animation: sparkle-twinkle 2.6s ease-in-out infinite; }
-  .cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after,
-  .cart-tier-mastered::after { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.3s; }
+  .cart-tier-bronze::before, .cart-tier-silver::before, .cart-tier-gold::before {
+    animation: sparkle-twinkle 2.6s ease-in-out infinite;
+  }
+  .cart-tier-bronze::after, .cart-tier-silver::after, .cart-tier-gold::after {
+    animation: sparkle-twinkle 2.6s ease-in-out infinite -1.3s;
+  }
 }
 @keyframes sparkle-twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1.15); }
 }
-/* Mastered gets two extra sparkle points (real elements, not just its two
-   pseudo-elements) so it reads as having more glimmer than the other
-   tiers without being animated differently. */
+/* Mastered uses 6 real sparkle spans (2 near the ridge, 2 down the left
+   side, 2 down the right side, mixed sizes) instead of the 2 pseudo-
+   elements the other tiers get — more points of light instead of motion
+   is what sets it apart. */
 .cart-sparkle {
   position: absolute;
   font-size: 9px;
@@ -487,11 +482,19 @@ main {
   pointer-events: none;
   opacity: 0.3;
 }
-.cart-sparkle.cs-1 { top: 42%; left: 6%; }
-.cart-sparkle.cs-2 { bottom: 6%; right: 12%; font-size: 8px; }
+.cart-sparkle.cs-1 { top: -6%; left: 6%; font-size: 8px; }
+.cart-sparkle.cs-2 { bottom: -6%; right: 6%; font-size: 8px; }
+.cart-sparkle.cs-3 { top: 20%; left: -8%; font-size: 7px; }
+.cart-sparkle.cs-4 { bottom: 15%; left: -9%; font-size: 14px; }
+.cart-sparkle.cs-5 { bottom: 8%; right: -7%; font-size: 8px; }
+.cart-sparkle.cs-6 { top: -8%; right: -6%; font-size: 13px; }
 @media (prefers-reduced-motion: no-preference) {
-  .cart-sparkle.cs-1 { animation: sparkle-twinkle 2.6s ease-in-out infinite -0.6s; }
-  .cart-sparkle.cs-2 { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.9s; }
+  .cart-sparkle.cs-1 { animation: sparkle-twinkle 2.6s ease-in-out infinite -0.2s; }
+  .cart-sparkle.cs-2 { animation: sparkle-twinkle 2.6s ease-in-out infinite -1.5s; }
+  .cart-sparkle.cs-3 { animation: sparkle-twinkle 2.8s ease-in-out infinite -0.8s; }
+  .cart-sparkle.cs-4 { animation: sparkle-twinkle 2.8s ease-in-out infinite -2.1s; }
+  .cart-sparkle.cs-5 { animation: sparkle-twinkle 3s ease-in-out infinite -1.1s; }
+  .cart-sparkle.cs-6 { animation: sparkle-twinkle 3s ease-in-out infinite -0.4s; }
 }
 
 .dummy-badge { display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--surface-raised); }
@@ -537,20 +540,13 @@ main {
   margin-bottom: 18px;
 }
 .reward-grid {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-}
-.reward-grid .reward-tile { flex: 0 0 calc((100% - 30px) / 4); min-width: 0; scroll-snap-align: start; }
-.reward-grid.expanded {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  overflow: visible;
+  gap: 10px;
+  overflow: hidden;
+  transition: max-height 0.42s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
-.reward-grid.expanded .reward-tile { flex: none; }
-.reward-tile { text-align: center; }
+.reward-tile { text-align: center; min-width: 0; }
 .reward-tile .badge-cart { width: 100%; padding: 6px; gap: 5px; }
 .reward-tile .badge-cart-icon { width: 100%; height: auto; aspect-ratio: 1; }
 .reward-tile .badge-cart-points { font-size: 9px; }
@@ -1236,22 +1232,36 @@ const RA = (() => {
       completed = padCategory(completed, ["gold", "mastered"], "Completed");
 
       el.innerHTML =
-        rewardCategoryHTML("Beaten Games", beaten, "beaten") +
-        rewardCategoryHTML("Completed Games", completed, "completed");
+        rewardCategoryHTML("Beaten", beaten, "beaten") +
+        rewardCategoryHTML("Completed", completed, "completed");
 
       $$(".reward-grid", el).forEach((grid) => {
         renderRewardGrid(grid, JSON.parse(grid.dataset.items));
+        setShelfHeight(grid, false);
       });
 
       $$(".expand-btn", el).forEach((btn) =>
         btn.addEventListener("click", () => {
           const grid = $("#" + btn.dataset.target);
-          const nowExpanded = grid.classList.toggle("expanded");
+          const nowExpanded = !grid.classList.contains("expanded");
+          grid.classList.toggle("expanded", nowExpanded);
+          setShelfHeight(grid, nowExpanded);
           btn.textContent = nowExpanded ? "Show less" : "Show all";
         })
       );
     } catch (err) {
       el.innerHTML = errorBanner(err) || `<div class="empty-state"><div class="glyph">⚠️</div>Couldn't load rewards.</div>`;
+    }
+  }
+
+  // Sets an explicit max-height so the .reward-grid's CSS transition has
+  // real pixel values to animate between — "auto" can't be transitioned.
+  function setShelfHeight(grid, expanded) {
+    if (expanded) {
+      grid.style.maxHeight = grid.scrollHeight + "px";
+    } else {
+      const firstTile = grid.querySelector(".reward-tile");
+      grid.style.maxHeight = firstTile ? firstTile.offsetHeight + "px" : "0px";
     }
   }
 
@@ -1385,7 +1395,7 @@ const RA = (() => {
         </div>
         <hr class="dashed-rule">
         <div class="spotlight-body">
-          ${badgeCartHTML({ badgeName: badge, points: pts, earned: alreadyEarned })}
+          ${badgeCartHTML({ badgeName: badge, points: pts, earned: true })}
           <div class="unlock-meta">
             <div class="spotlight-title-muted">${escapeHtml(title)}</div>
             ${desc ? `<div class="spotlight-desc-big">${escapeHtml(desc)}</div>` : ""}
@@ -1414,11 +1424,14 @@ const RA = (() => {
     const resolvedUrl = iconUrl || (badgeName ? badgeUrl(badgeName, earned) : "");
     const style = resolvedUrl ? ` style="background-image:url('${resolvedUrl}')"` : "";
     const tierClass = tier ? ` cart-tier-${tier}` : "";
+    const lockedClass = !earned ? " locked" : "";
     const barText = tier ? TIER_LABELS[tier] : `${points} pts`;
     const extraSparkles =
-      tier === "mastered" ? `<span class="cart-sparkle cs-1">✦</span><span class="cart-sparkle cs-2">✦</span>` : "";
+      tier === "mastered"
+        ? [1, 2, 3, 4, 5, 6].map((n) => `<span class="cart-sparkle cs-${n}">✦</span>`).join("")
+        : "";
     return `
-      <div class="badge-cart${tierClass}">
+      <div class="badge-cart${tierClass}${lockedClass}">
         ${extraSparkles}
         <div class="badge-cart-icon ${earned ? "" : "locked"} ${resolvedUrl ? "" : "dummy-badge"}"${style}>${resolvedUrl ? "" : "🏵️"}</div>
         <div class="badge-cart-points pixel">${escapeHtml(barText)}</div>
@@ -1681,13 +1694,20 @@ const RA = (() => {
   function renderCartPreview() {
     const el = $("#cartPreviewGrid");
     if (!el) return;
-    const tiers = [null, "bronze", "silver", "gold", "mastered"];
-    el.innerHTML = tiers
+    const entries = [
+      { tier: null, earned: false, label: "Minecraft (locked)" },
+      { tier: null, earned: true, label: "Minecraft" },
+      { tier: "bronze", earned: true, label: "Minecraft" },
+      { tier: "silver", earned: true, label: "Minecraft" },
+      { tier: "gold", earned: true, label: "Minecraft" },
+      { tier: "mastered", earned: true, label: "Minecraft" },
+    ];
+    el.innerHTML = entries
       .map(
-        (tier) => `
+        ({ tier, earned, label }) => `
       <div class="award-tile">
-        ${badgeCartHTML({ points: 10, earned: true, tier })}
-        <div class="label">Minecraft</div>
+        ${badgeCartHTML({ points: 10, earned, tier })}
+        <div class="label">${escapeHtml(label)}</div>
       </div>`
       )
       .join("");
