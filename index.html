@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Cart — RetroAchievements</title>
 <meta name="description" content="Your RetroAchievements progress, unlocks, and library as an installable app.">
-<meta name="theme-color" content="#0d0f14">
+<meta name="theme-color" content="#1c1c1c">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -15,15 +15,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap');
 
 :root {
-  --bg: #0d0f14;
-  --surface: #171a23;
-  --surface-raised: #1f2330;
-  --border: #2a2f3d;
-  --text: #eef0f5;
-  --text-muted: #8b8fa3;
-  --gold: #f2b84b;
-  --gold-dim: #7a5f2a;
-  --teal: #47e6b8;
+  --bg: #1c1c1c;
+  --surface: #161616;
+  --surface-raised: #242424;
+  --border: #333333;
+  --text: #ffffff;
+  --text-muted: #737373;
+  --text-dim: #4d4d4d;
+  --gold: #cb961b;
+  --gold-dim: #6e5313;
+  --blue: #2d96fa;
+  --green: #7fcd97;
   --red: #ff6b6b;
   --tab-h: 64px;
   --top-h: 56px;
@@ -88,17 +90,18 @@ body {
 }
 
 .topbar .wordmark { font-size: 16px; color: var(--text); }
-.topbar .wordmark span { color: var(--gold); }
+.topbar .wordmark .wm-r { color: var(--blue); }
+.topbar .wordmark .wm-a { color: var(--gold); }
 
 .topbar .points {
   margin-left: auto;
   font-size: 12px;
-  color: var(--gold);
+  color: var(--blue);
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.topbar .points .dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
+.topbar .points .dot { width: 6px; height: 6px; background: var(--blue); border-radius: 50%; }
 
 main {
   flex: 1;
@@ -123,7 +126,7 @@ main {
   gap: 8px;
 }
 .eyebrow:first-child { margin-top: 4px; }
-.eyebrow::before { content: ""; width: 10px; height: 10px; background: var(--teal); flex: none; }
+.eyebrow::before { content: ""; width: 10px; height: 10px; background: var(--blue); flex: none; }
 
 /* ---------- Cards ---------- */
 .card {
@@ -216,12 +219,12 @@ main {
 .unlock-meta .meta-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; }
 .pts-pill {
   font-family: 'IBM Plex Mono', monospace;
-  color: var(--gold);
-  border: 1px solid var(--gold-dim);
+  border: 1px solid;
   border-radius: 4px;
   padding: 1px 6px;
 }
 .time-ago { color: var(--text-muted); }
+.confirm-text { color: var(--green); }
 
 /* Game / cartridge card */
 .game-card { display: flex; gap: 12px; align-items: center; cursor: pointer; }
@@ -242,9 +245,9 @@ main {
 }
 .xp-bar .fill {
   height: 100%;
-  background: repeating-linear-gradient(90deg, var(--teal) 0 6px, #35c79f 6px 7px);
+  background: repeating-linear-gradient(90deg, var(--blue) 0 6px, #1f74c4 6px 7px);
 }
-.xp-bar .fill.complete { background: repeating-linear-gradient(90deg, var(--gold) 0 6px, #d99e2f 6px 7px); }
+.xp-bar .fill.complete { background: repeating-linear-gradient(90deg, var(--gold) 0 6px, #a67816 6px 7px); }
 .game-info .pct { font-size: 10.5px; color: var(--text-muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
 
 /* Now playing — bigger, Athena-style: icon + [system / title] up top,
@@ -286,7 +289,7 @@ main {
   flex: 1;
   background: none;
   border: none;
-  color: #666a78;
+  color: var(--text-dim);
   font-size: 11px;
   font-weight: 600;
   padding: 10px 4px;
@@ -531,7 +534,7 @@ main {
 .reward-category { margin-bottom: 6px; }
 .reward-category-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 10px; }
 .reward-category-head .name { font-size: 13px; font-weight: 700; }
-.reward-category-head .expand-btn { background: none; border: none; color: var(--teal); font-size: 11px; font-weight: 600; padding: 4px 0; }
+.reward-category-head .expand-btn { background: none; border: none; color: var(--blue); font-size: 11px; font-weight: 600; padding: 4px 0; }
 .reward-shelf {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -579,7 +582,7 @@ main {
   margin-bottom: 12px;
   line-height: 1.5;
 }
-.banner a { color: var(--teal); }
+.banner a { color: var(--blue); }
 
 /* ---------- Forms ---------- */
 label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 6px; }
@@ -594,7 +597,7 @@ input[type=text], input[type=password], input[type=search] {
   font-size: 14px;
   font-family: 'IBM Plex Mono', monospace;
 }
-input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 
 .btn {
   display: inline-flex;
@@ -615,7 +618,7 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 
 .field-help { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
-.field-help a { color: var(--teal); }
+.field-help a { color: var(--blue); }
 
 /* ---------- Tab bar ---------- */
 .tabbar {
@@ -632,7 +635,7 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
   flex: 1;
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-dim);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -700,7 +703,7 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 
 .spinner {
   width: 22px; height: 22px; border-radius: 50%;
-  border: 3px solid var(--border); border-top-color: var(--teal);
+  border: 3px solid var(--border); border-top-color: var(--blue);
   animation: spin .7s linear infinite; margin: 24px auto;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -714,7 +717,7 @@ input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
 
   <header class="topbar">
     <div class="cart-slot" aria-hidden="true"></div>
-    <div class="wordmark pixel">CART<span>_RA</span></div>
+    <div class="wordmark pixel">CART_<span class="wm-r">R</span><span class="wm-a">A</span></div>
     <div class="points" id="topbarPoints"></div>
   </header>
 
@@ -1399,7 +1402,7 @@ const RA = (() => {
           <div class="unlock-meta">
             <div class="spotlight-title-muted">${escapeHtml(title)}</div>
             ${desc ? `<div class="spotlight-desc-big">${escapeHtml(desc)}</div>` : ""}
-            ${alreadyEarned ? `<div class="time-ago" style="margin-top:8px;">✓ you've got this one</div>` : ""}
+            ${alreadyEarned ? `<div class="confirm-text" style="margin-top:8px;">✓ you've got this one</div>` : ""}
           </div>
         </div>
       </div>`;
@@ -1502,6 +1505,17 @@ const RA = (() => {
     return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
   }
 
+  // RetroAchievements' own achievement-type color system, used only in
+  // achievement LIST contexts (not on cartridge point badges, which stay
+  // whatever the cart component already renders them as).
+  function achievementTypeColor(type) {
+    const t = (type || "").toLowerCase();
+    if (t === "progression") return "var(--green)";
+    if (t === "win_condition") return "var(--gold)";
+    if (t === "missable") return "var(--red)";
+    return "var(--blue)"; // type: none / general achievement
+  }
+
   function renderAchievementRows(achievements) {
     if (!achievements.length) return '<div class="empty-state">No achievements listed.</div>';
     return achievements
@@ -1511,6 +1525,7 @@ const RA = (() => {
         const d = pick(a, "Description");
         const pts = pick(a, "Points") ?? 0;
         const badge = pick(a, "BadgeName");
+        const typeColor = achievementTypeColor(pick(a, "Type"));
         return `
         <div class="ach-row">
           <div class="badge-slot ${earned ? "" : "locked"}" style="background-image:url('${badgeUrl(badge, earned)}')"></div>
@@ -1518,7 +1533,7 @@ const RA = (() => {
             <div class="title">${escapeHtml(t)}</div>
             <div class="desc">${escapeHtml(d)}</div>
           </div>
-          <span class="pts-pill">${pts}</span>
+          <span class="pts-pill" style="color:${typeColor};border-color:${typeColor};">${pts}</span>
         </div>`;
       })
       .join("");
