@@ -249,7 +249,24 @@ main {
 .media-header .game-icon { width: 60px; height: 60px; }
 .media-header .console { font-size: 12px; }
 .media-header .title { font-size: 19px; font-weight: 700; margin-top: 3px; }
+.now-playing .media-header { align-items: flex-start; }
+.console-line { font-size: 12px; font-weight: 600; color: var(--blue); display: flex; align-items: center; gap: 5px; }
+.rp-msg { font-size: 12.5px; color: var(--text); margin-top: 8px; line-height: 1.5; }
 .dashed-rule { border: none; border-top: 2px dashed rgba(255,255,255,0.18); margin: 14px 0; }
+
+/* Home section headers (Recently Played, Achievement of the Week) — title
+   in blue, meta text (time ago / days left) right-aligned in muted gray,
+   no leading square. */
+.eyebrow-ra {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 22px 0 10px;
+  gap: 10px;
+}
+.eyebrow-ra:first-child { margin-top: 4px; }
+.eyebrow-ra .title { font-size: 14px; font-weight: 700; color: var(--blue); }
+.eyebrow-ra .meta { font-size: 11px; color: var(--text-muted); flex: none; }
 
 /* Pill switcher — Home's Recently Played / Recent Achievements / Rewards
    segmented control, with a sliding highlight behind the active tab. */
@@ -258,7 +275,7 @@ main {
   display: flex;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 12px;
   padding: 4px;
   margin: 22px 0 16px;
 }
@@ -270,7 +287,7 @@ main {
   width: calc((100% - 8px) / 3);
   background: var(--surface-raised);
   border: 1px solid var(--gold-dim);
-  border-radius: 999px;
+  border-radius: 9px;
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
   z-index: 0;
 }
@@ -284,7 +301,7 @@ main {
   font-size: 11px;
   font-weight: 600;
   padding: 10px 4px;
-  border-radius: 999px;
+  border-radius: 9px;
   text-align: center;
   line-height: 1.25;
 }
@@ -305,9 +322,6 @@ main {
 .stat-row .stat-pct { font-size: 15px; font-weight: 700; color: var(--gold); font-family: 'IBM Plex Mono', monospace; }
 
 /* Spotlight (Achievement of the Week) */
-.spotlight-header { display: flex; align-items: baseline; justify-content: space-between; margin: 22px 0 10px; }
-.spotlight-header .eyebrow { margin: 0; }
-.spotlight-header .spotlight-countdown { font-size: 11px; color: var(--text-muted); }
 .spotlight-card { padding: 16px; cursor: pointer; }
 .spotlight-card:active { background: var(--surface-raised); }
 .spotlight-body { display: flex; gap: 14px; align-items: flex-start; }
@@ -987,6 +1001,56 @@ const RA = (() => {
     return then.toLocaleDateString();
   }
 
+  // RetroAchievements-style short console names, for compact header rows.
+  // Falls back to the full console name if we don't have a mapping for it.
+  const CONSOLE_ABBREV = {
+    "Nintendo Entertainment System": "NES",
+    "Super Nintendo Entertainment System": "SNES",
+    "Nintendo 64": "N64",
+    "GameCube": "GCN",
+    "Wii": "Wii",
+    "Wii U": "WiiU",
+    "Game Boy": "GB",
+    "Game Boy Color": "GBC",
+    "Game Boy Advance": "GBA",
+    "Nintendo DS": "NDS",
+    "Nintendo DSi": "DSi",
+    "Virtual Boy": "VB",
+    "PlayStation": "PS1",
+    "PlayStation 2": "PS2",
+    "PlayStation Portable": "PSP",
+    "Sega Saturn": "SAT",
+    "Sega Genesis/Mega Drive": "GEN",
+    "Sega Mega Drive": "GEN",
+    "Sega Genesis": "GEN",
+    "Sega CD": "SCD",
+    "Sega 32X": "32X",
+    "Sega Master System": "SMS",
+    "Sega Game Gear": "GG",
+    "Dreamcast": "DC",
+    "Atari 2600": "2600",
+    "Atari 7800": "7800",
+    "Atari Jaguar": "JAG",
+    "Atari Lynx": "LYNX",
+    "PC Engine/TurboGrafx-16": "PCE",
+    "TurboGrafx-16/PC Engine CD": "PCE-CD",
+    "Neo Geo Pocket": "NGP",
+    "Neo Geo Pocket Color": "NGPC",
+    "WonderSwan": "WS",
+    "WonderSwan Color": "WSC",
+    "3DO Interactive Multiplayer": "3DO",
+    "ColecoVision": "CV",
+    "Intellivision": "INTV",
+    "Vectrex": "VEC",
+    "Pokemon Mini": "PKMN",
+    "Arcade": "ARC",
+    "MSX": "MSX",
+  };
+  function consoleAbbrev(name) {
+    if (!name) return "";
+    return CONSOLE_ABBREV[name] || name;
+  }
+
   function badgeUrl(badgeName, unlocked = true) {
     if (!badgeName) return "";
     const suffix = unlocked ? "" : "_lock";
@@ -1065,7 +1129,7 @@ const RA = (() => {
     const spotlightEl = $("#spotlightSlot");
     bannerEl.innerHTML = "";
     nowPlayingEl.innerHTML = "";
-    spotlightEl.innerHTML = '<div class="eyebrow">Achievement of the week</div><div class="spinner"></div>';
+    spotlightEl.innerHTML = '<div class="eyebrow-ra"><span class="title pixel">Achievement of the week</span></div><div class="spinner"></div>';
     currentGameId = null;
     homePanesLoaded.clear();
 
@@ -1094,9 +1158,16 @@ const RA = (() => {
       const lastGameId = pick(profile, "LastGameID");
       if (lastGameId) {
         currentGameId = String(lastGameId);
-        // Non-fatal: the rest of Home should still work if this fails.
-        RA.getGameInfoAndUserProgress(username, lastGameId)
-          .then((game) => renderNowPlaying(profile, game))
+        // Non-fatal: the rest of Home should still work if either of
+        // these fails.
+        Promise.all([
+          RA.getGameInfoAndUserProgress(username, lastGameId),
+          RA.getUserRecentlyPlayedGames(username, 1).catch(() => null),
+        ])
+          .then(([game, recentList]) => {
+            const lastPlayed = Array.isArray(recentList) && recentList[0] ? pick(recentList[0], "LastPlayed") : null;
+            renderNowPlaying(profile, game, lastPlayed);
+          })
           .catch(() => {});
       }
     } catch (err) {
@@ -1349,14 +1420,16 @@ const RA = (() => {
     );
   }
 
-  function renderNowPlaying(profile, game) {
+  function renderNowPlaying(profile, game, lastPlayed) {
     const title = pick(game, "Title");
     if (!title) return;
     const icon = RA.mediaUrl(pick(game, "ImageIcon"));
     const shot = RA.mediaUrl(pick(game, "ImageIngame") || pick(game, "ImageTitle"));
-    const console_ = pick(game, "ConsoleName");
+    const console_ = consoleAbbrev(pick(game, "ConsoleName"));
+    const rp = pick(profile, "RichPresenceMsg");
     const bgClass = shot ? " card-bg-shot-color" : "";
     const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
+    const playedAgo = timeAgo(lastPlayed);
 
     const achObj = pick(game, "Achievements") || {};
     const total = Object.keys(achObj).length;
@@ -1364,13 +1437,17 @@ const RA = (() => {
     const pct = total ? Math.round((earned / total) * 100) : 0;
 
     $("#nowPlayingSlot").innerHTML = `
-      <div class="eyebrow pixel" style="margin-top:4px;">Currently playing</div>
+      <div class="eyebrow-ra" style="margin-top:4px;">
+        <span class="title pixel">Recently Played</span>
+        ${playedAgo ? `<span class="meta">${escapeHtml(playedAgo)}</span>` : ""}
+      </div>
       <div class="card now-playing anim-in${bgClass}" data-gameid="${pick(game, "ID")}"${bgStyle}>
         <div class="media-header">
           <div class="game-icon" style="background-image:url('${icon}')"></div>
           <div class="game-info">
-            <div class="console">${escapeHtml(console_)}</div>
+            <div class="console-line">🎮 ${escapeHtml(console_)}</div>
             <div class="title">${escapeHtml(title)}</div>
+            ${rp ? `<div class="rp-msg">${escapeHtml(rp)}</div>` : ""}
           </div>
         </div>
         <hr class="dashed-rule">
@@ -1433,9 +1510,9 @@ const RA = (() => {
     const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
 
     el.innerHTML = `
-      <div class="spotlight-header">
-        <div class="eyebrow pixel">Achievement of the week</div>
-        ${daysLeftText ? `<span class="spotlight-countdown">${escapeHtml(daysLeftText)}</span>` : ""}
+      <div class="eyebrow-ra">
+        <span class="title pixel">Achievement of the week</span>
+        ${daysLeftText ? `<span class="meta">${escapeHtml(daysLeftText)}</span>` : ""}
       </div>
       <div class="card spotlight-card anim-in${bgClass}" ${gameId ? `data-gameid="${gameId}"` : ""}${bgStyle}>
         <div class="media-header">
