@@ -726,8 +726,8 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 }
 .gd-header {
   position: relative;
-  padding: calc(var(--safe-t) + 18px) 18px 26px;
-  min-height: 480px;
+  padding: calc(var(--safe-t) + 18px) 18px 28px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -753,7 +753,7 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 .gd-icon-btn {
   position: absolute;
   top: calc(var(--safe-t) + 14px);
-  width: 44px; height: 44px;
+  width: 50px; height: 50px;
   border-radius: 50%;
   background: rgba(20,20,20,0.55);
   backdrop-filter: blur(10px);
@@ -763,26 +763,26 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
   transition: transform 0.15s ease, background 0.2s ease;
 }
 .gd-icon-btn:active { transform: scale(0.92); }
-.gd-icon-btn svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
+.gd-icon-btn svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2; }
 .gd-back { left: 14px; }
 .gd-bookmark { right: 14px; }
 .gd-bookmark.active { background: rgba(127,205,151,0.25); }
 .gd-bookmark.active svg { stroke: var(--green); fill: var(--green); }
-.gd-boxart-wrap { margin-top: 46px; transition: opacity 0.12s linear, transform 0.12s linear; }
+.gd-boxart-wrap { margin-top: 50px; transition: opacity 0.12s linear, transform 0.12s linear; }
 .gd-boxart {
-  max-width: 46%;
-  max-height: 200px;
+  max-width: 52%;
+  max-height: 230px;
   width: auto; height: auto;
   border-radius: 8px;
   box-shadow: 0 12px 28px rgba(0,0,0,0.55);
 }
-.gd-title { font-size: 21px; font-weight: 700; color: #fff; margin-top: 16px; padding: 0 10px; }
-.gd-devpub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
-.gd-meta-row { display: flex; justify-content: center; gap: 28px; margin-top: 22px; width: 100%; }
+.gd-title { font-size: 24px; font-weight: 700; color: #fff; margin-top: 18px; padding: 0 10px; }
+.gd-devpub { font-size: 13.5px; color: var(--text-muted); margin-top: 5px; }
+.gd-meta-row { display: flex; justify-content: center; gap: 30px; margin-top: 24px; width: 100%; }
 .gd-meta { text-align: center; }
-.gd-meta .v { font-size: 15px; font-weight: 700; color: #fff; }
-.gd-meta .icon { font-size: 18px; line-height: 1.3; }
-.gd-meta .l { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+.gd-meta .v { font-size: 17px; font-weight: 700; color: #fff; }
+.gd-meta .icon { font-size: 20px; line-height: 1.3; }
+.gd-meta .l { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 .gd-body { padding: 16px 14px calc(24px + var(--safe-b)); background: var(--bg); }
 
 /* Set / Info / Stats selector reuses .pill-switcher (already rectangular)
@@ -791,56 +791,16 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 .gd-section { display: none; }
 .gd-section.active { display: block; }
 
-.set-selector-box {
-  background: var(--surface);
-  border-radius: 12px;
-  padding: 10px;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.set-selector-row { display: flex; gap: 8px; overflow-x: auto; flex: 1; }
-.set-tile {
-  flex: none;
-  width: 52px; height: 52px;
-  border-radius: 8px;
-  background: var(--bg) center/cover no-repeat;
-  border: 2px solid transparent;
-  position: relative;
-}
-.set-tile.active { border-color: var(--gold); }
-.set-tile .bar { position: absolute; left: 6px; right: 6px; bottom: -6px; height: 2px; background: var(--gold); border-radius: 2px; }
-.set-config-btn {
-  flex: none;
-  width: 40px; height: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--gold-dim);
-  background: none;
-  color: var(--gold);
-  display: flex; align-items: center; justify-content: center;
-}
-.set-config-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-
 .set-info-name { font-size: 15px; font-weight: 700; color: var(--gold); }
 .set-info-line { font-size: 12.5px; color: var(--blue); margin-top: 6px; }
 .set-info-line.mine { color: var(--gold); }
 
-.set-progress-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14px; }
-.set-progress-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); }
-.set-progress-item svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
+.set-progress-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 16px; }
+.set-progress-item { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); }
+.set-progress-item svg { width: 22px; height: auto; stroke: var(--text-muted); fill: none; stroke-width: 1.8; overflow: visible; flex: none; }
 .set-progress-item.done { color: var(--gold); }
 .set-progress-item.done svg { stroke: var(--gold); fill: var(--gold); }
-.set-progress-divider { width: 1px; height: 18px; background: var(--border); }
-
-.authors-bar {
-  text-align: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--gold);
-  margin-top: 14px;
-}
-.authors-bar .sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+.set-progress-divider { width: 1px; height: 20px; background: var(--border); }
 
 .gd-controls-row { display: flex; gap: 8px; margin-top: 18px; }
 .gd-sort-select {
@@ -866,10 +826,6 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s ease;
 }
-.gd-view-toggle { display: flex; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; flex: none; }
-.gd-view-toggle button { border: none; background: none; padding: 10px 9px; color: var(--text-dim); }
-.gd-view-toggle button.active { background: var(--surface-raised); color: var(--gold); }
-.gd-view-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; display: block; }
 
 .gd-filter-btn {
   width: 100%;
@@ -1202,6 +1158,7 @@ const RA = (() => {
     getAchievementOfTheWeek: () => call("API_GetAchievementOfTheWeek.php"),
     getUserRecentlyPlayedGames: (username, count = 10) =>
       call("API_GetUserRecentlyPlayedGames.php", { u: username, c: count }),
+    getConsoleIds: () => call("API_GetConsoleIDs.php"),
   };
 })();
 
@@ -1231,54 +1188,102 @@ const RA = (() => {
     return then.toLocaleDateString();
   }
 
-  // RetroAchievements-style short console names, for compact header rows.
-  // Falls back to the full console name if we don't have a mapping for it.
+  // Official RetroAchievements console abbreviations. Full console names
+  // are only used on the game page header and console search; the
+  // abbreviation is used everywhere else.
   const CONSOLE_ABBREV = {
-    "Nintendo Entertainment System": "NES",
-    "Super Nintendo Entertainment System": "SNES",
-    "Nintendo 64": "N64",
-    "GameCube": "GCN",
-    "Wii": "Wii",
-    "Wii U": "WiiU",
-    "Game Boy": "GB",
-    "Game Boy Color": "GBC",
-    "Game Boy Advance": "GBA",
-    "Nintendo DS": "NDS",
-    "Nintendo DSi": "DSi",
-    "Virtual Boy": "VB",
-    "PlayStation": "PS1",
-    "PlayStation 2": "PS2",
-    "PlayStation Portable": "PSP",
-    "Sega Saturn": "SAT",
-    "Sega Genesis/Mega Drive": "GEN",
-    "Sega Mega Drive": "GEN",
-    "Sega Genesis": "GEN",
-    "Sega CD": "SCD",
-    "Sega 32X": "32X",
-    "Sega Master System": "SMS",
-    "Sega Game Gear": "GG",
-    "Dreamcast": "DC",
     "Atari 2600": "2600",
     "Atari 7800": "7800",
     "Atari Jaguar": "JAG",
-    "Atari Lynx": "LYNX",
+    "Atari Jaguar CD": "JCD",
+    "Atari Lynx": "Lynx",
+    "PC Engine CD/TurboGrafx-CD": "PCCD",
     "PC Engine/TurboGrafx-16": "PCE",
-    "TurboGrafx-16/PC Engine CD": "PCE-CD",
-    "Neo Geo Pocket": "NGP",
-    "Neo Geo Pocket Color": "NGPC",
-    "WonderSwan": "WS",
-    "WonderSwan Color": "WSC",
+    "PC-8000/8800": "80/88",
+    "PC-FX": "PC-FX",
+    "Game Boy": "GB",
+    "Game Boy Advance": "GBA",
+    "Game Boy Color": "GBC",
+    "GameCube": "GC",
+    "NES/Famicom": "NES",
+    "Nintendo 64": "N64",
+    "Nintendo DS": "DS",
+    "Nintendo DSi": "DSi",
+    "Pokémon Mini": "MINI",
+    "SNES/Super Famicom": "SNES",
+    "Virtual Boy": "VB",
+    "Wii": "Wii",
+    "32X": "32X",
+    "Dreamcast": "DC",
+    "Game Gear": "GG",
+    "Genesis/Mega Drive": "MD",
+    "Master System": "SMS",
+    "SG-1000": "SG1K",
+    "Saturn": "SAT",
+    "Sega CD": "SCD",
+    "PlayStation": "PS1",
+    "PlayStation 2": "PS2",
+    "PlayStation Portable": "PSP",
     "3DO Interactive Multiplayer": "3DO",
-    "ColecoVision": "CV",
-    "Intellivision": "INTV",
-    "Vectrex": "VEC",
-    "Pokemon Mini": "PKMN",
+    "Amstrad CPC": "CPC",
+    "Apple II": "A2",
     "Arcade": "ARC",
+    "Arcadia 2001": "A2001",
+    "Arduboy": "ARD",
+    "ColecoVision": "CV",
+    "Elektor TV Game Computer": "ELEK",
+    "Fairchild Channel F": "CHF",
+    "Famicom Disk System": "FDS",
+    "Intellivision": "INTV",
+    "Interton VC 4000": "VC4000",
     "MSX": "MSX",
+    "Magnavox Odyssey 2": "MO2",
+    "Mega Duck": "DUCK",
+    "Neo Geo CD": "NGCD",
+    "Neo Geo Pocket": "NGP",
+    "Standalone": "EXE",
+    "Uzebox": "UZE",
+    "Vectrex": "VECT",
+    "WASM-4": "WASM4",
+    "Watara Supervision": "WSV",
+    "WonderSwan": "WS",
   };
   function consoleAbbrev(name) {
     if (!name) return "";
     return CONSOLE_ABBREV[name] || name;
+  }
+
+  // Real console icons, straight from RA's own asset CDN — fetched once
+  // at app startup (see init, below) since the console list is small and
+  // barely ever changes. consoleIconUrl() is synchronous: it just reads
+  // whatever's in the cache so far, falling back to null (→ 🎮 emoji) if
+  // the fetch hasn't resolved yet.
+  let consoleIconMap = null;
+  function primeConsoleIcons() {
+    RA.getConsoleIds()
+      .then((list) => {
+        const map = {};
+        (Array.isArray(list) ? list : []).forEach((c) => {
+          map[String(pick(c, "ID"))] = pick(c, "IconURL");
+        });
+        consoleIconMap = map;
+      })
+      .catch(() => {
+        consoleIconMap = {};
+      });
+  }
+  function consoleIconUrl(consoleId) {
+    if (!consoleIconMap || !consoleId) return null;
+    return consoleIconMap[String(consoleId)] || null;
+  }
+  // Returns ready-to-use HTML for a small console glyph: the real icon if
+  // we have it cached, otherwise the 🎮 placeholder — never blocks render.
+  function consoleGlyphHTML(consoleId, size) {
+    const url = consoleIconUrl(consoleId);
+    const px = size || 16;
+    return url
+      ? `<img src="${url}" alt="" style="width:${px}px;height:${px}px;object-fit:contain;vertical-align:middle;">`
+      : `<span style="font-size:${px}px;line-height:1;">🎮</span>`;
   }
 
   function badgeUrl(badgeName, unlocked = true) {
@@ -1656,6 +1661,7 @@ const RA = (() => {
     const icon = RA.mediaUrl(pick(game, "ImageIcon"));
     const shot = RA.mediaUrl(pick(game, "ImageIngame") || pick(game, "ImageTitle"));
     const console_ = consoleAbbrev(pick(game, "ConsoleName"));
+    const consoleId = pick(game, "ConsoleID");
     const rp = pick(profile, "RichPresenceMsg");
     const bgClass = shot ? " card-bg-shot-color" : "";
     const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
@@ -1675,7 +1681,7 @@ const RA = (() => {
         <div class="media-header">
           <div class="game-icon" style="background-image:url('${icon}')"></div>
           <div class="game-info">
-            <div class="console-line">🎮 ${escapeHtml(console_)}</div>
+            <div class="console-line">${consoleGlyphHTML(consoleId, 14)} ${escapeHtml(console_)}</div>
             <div class="title">${escapeHtml(title)}</div>
             ${rp ? `<div class="rp-msg">${escapeHtml(rp)}</div>` : ""}
           </div>
@@ -2013,6 +2019,7 @@ const RA = (() => {
 
       const title = pick(progress, "Title");
       const consoleName = pick(progress, "ConsoleName");
+      const consoleId = pick(progress, "ConsoleID");
       const shot = RA.mediaUrl(pick(ext, "ImageIngame") || pick(progress, "ImageIngame") || pick(progress, "ImageTitle"));
       const boxArt = RA.mediaUrl(pick(ext, "ImageBoxArt") || pick(progress, "ImageBoxArt") || pick(progress, "ImageIcon"));
       const developer = pick(ext, "Developer");
@@ -2036,7 +2043,6 @@ const RA = (() => {
       const beaten = winConditions.length > 0 && winConditions.every((a) => pick(a, "DateEarned"));
 
       const hasMissable = allAchievements.some((a) => (pick(a, "Type") || "").toLowerCase() === "missable");
-      const authors = Array.from(new Set(allAchievements.map((a) => pick(a, "Author")).filter(Boolean)));
 
       const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
 
@@ -2058,7 +2064,7 @@ const RA = (() => {
           ${devPub ? `<div class="gd-devpub">${escapeHtml(devPub)}</div>` : ""}
           <div class="gd-meta-row">
             <div class="gd-meta"><div class="v">${escapeHtml(releaseYear)}</div><div class="l">Release</div></div>
-            <div class="gd-meta"><div class="icon">🎮</div><div class="l">${escapeHtml(consoleName || "")}</div></div>
+            <div class="gd-meta"><div class="icon">${consoleGlyphHTML(consoleId, 24)}</div><div class="l">${escapeHtml(consoleName || "")}</div></div>
             <div class="gd-meta"><div class="v">${players ? Number(players).toLocaleString() : "—"}</div><div class="l">Players</div></div>
           </div>
         </div>
@@ -2071,45 +2077,28 @@ const RA = (() => {
           </div>
 
           <div class="gd-section active" id="gd-section-set">
-            <div class="set-selector-box">
-              <div class="set-selector-row">
-                <div class="set-tile active" style="background-image:url('${RA.mediaUrl(pick(progress, "ImageIcon"))}')">
-                  <div class="bar"></div>
-                </div>
-              </div>
-              <button class="set-config-btn" aria-label="Configure sets">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
-              </button>
-            </div>
-
             <div class="card">
               <div class="set-info-name">Base Set</div>
               <div class="set-info-line">${total} achievements worth ${totalPoints} points.</div>
               <div class="set-info-line mine">Unlocked ${earnedCount} achievement${earnedCount === 1 ? "" : "s"} worth ${earnedPoints} points.</div>
               <div class="set-progress-row">
                 <div class="set-progress-item ${mastered ? "done" : ""}">
-                  <svg stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>
+                  <svg viewBox="0 0 24 28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6.5"/><path d="M8.3 14.7L6.5 26.5l5.5-3.3 5.5 3.3-1.8-11.8"/></svg>
                   ${pct}%
                 </div>
                 <div class="set-progress-divider"></div>
                 <div class="set-progress-item ${beaten || mastered ? "done" : ""}">
                   ${
                     mastered
-                      ? `<svg stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>`
+                      ? `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polyline points="7.8 12.5 10.8 15.5 16.2 9"/></svg>`
                       : beaten
-                      ? `<svg stroke-width="2" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>`
-                      : `<svg stroke-width="1.8" stroke-dasharray="2.5 3.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg>`
+                      ? `<svg viewBox="0 0 24 24" stroke-width="2" fill="currentColor"><circle cx="12" cy="12" r="9.5"/></svg>`
+                      : `<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-dasharray="2.5 3.2"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg>`
                   }
-                  ${mastered ? "Mastered" : beaten ? "Beaten" : "Beaten"}
+                  ${mastered ? "Mastered" : "Beaten"}
                 </div>
               </div>
             </div>
-
-            ${
-              authors.length
-                ? `<div class="card authors-bar">${authors.length} Author${authors.length === 1 ? "" : "s"}<span class="sub">${escapeHtml(authors.slice(0, 3).join(", "))}</span></div>`
-                : ""
-            }
 
             <div class="gd-controls-row">
               <select class="gd-sort-select" id="gdSortSelect">
@@ -2119,13 +2108,9 @@ const RA = (() => {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>
               </button>
             </div>
-            <div class="gd-view-toggle" style="margin-top:8px;">
-              <button class="active" data-view="achievements">🏆 ${total}</button>
-              <button data-view="speedrun">☰ 0</button>
-            </div>
             <button class="gd-filter-btn" id="gdFilterBtn">
-              <span class="left">${hasMissable ? "! Missable Only" : "Locked Only"}</span>
-              <span class="count" id="gdFilterCount"></span>
+              <span class="left">All achievements</span>
+              <span class="count" id="gdFilterCount">${total}</span>
             </button>
 
             <div class="gd-ach-list" id="gdAchList"></div>
@@ -2155,25 +2140,11 @@ const RA = (() => {
         })
       );
 
-      // ---- achievements/speedrun toggle ----
-      $$(".gd-view-toggle button", gd).forEach((btn) =>
-        btn.addEventListener("click", () => {
-          $$(".gd-view-toggle button", gd).forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          if (btn.dataset.view === "speedrun") {
-            listEl.innerHTML = `<div class="empty-state"><div class="glyph">⏱️</div>Community speedrun records are coming in a later step.</div>`;
-          } else {
-            renderList();
-          }
-        })
-      );
-
       // ---- sort + filter + list rendering ----
       const listEl = $("#gdAchList", gd);
       let sortMode = "unlocked";
       let sortDir = 1;
-      let filterActive = true;
-      const filterLabel = hasMissable ? "Missable Only" : "Locked Only";
+      let filterActive = false;
 
       function renderList() {
         let list = allAchievements;
@@ -2250,7 +2221,7 @@ const RA = (() => {
           const y = gd.scrollTop;
           scrollTopBtn.classList.toggle("show", y > 400);
           const progress = Math.min(1, y / COLLAPSE_RANGE);
-          gdHeader.style.minHeight = 480 - progress * 220 + "px";
+          gdHeader.style.minHeight = 500 - progress * 230 + "px";
           gdBoxartWrap.style.opacity = String(1 - progress * 0.85);
           gdBoxartWrap.style.transform = `scale(${1 - progress * 0.35}) translateY(${-progress * 20}px)`;
           scrollTicking = false;
@@ -2275,6 +2246,7 @@ const RA = (() => {
     const proxyUrl = $("#inProxy").value.trim();
     RA.saveSettings({ username, apiKey, proxyUrl });
     loaded.clear();
+    if (!consoleIconMap) primeConsoleIcons();
     showScreen("home");
   });
 
@@ -2358,6 +2330,7 @@ const RA = (() => {
   hydrateSettingsForm();
   renderCartPreview();
   initPillSwitcher();
+  if (RA.isConfigured()) primeConsoleIcons();
   initTopbarScroll();
   if (!RA.isConfigured()) {
     showScreen("profile");
