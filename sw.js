@@ -1,10 +1,12 @@
-const CACHE = "cart-shell-v18";
+const CACHE = "cart-shell-v19";
 const SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./fonts/GoogleSansFlex.ttf",
+  "./fonts/MozillaHeadline.ttf",
 ];
 
 self.addEventListener("install", (event) => {
