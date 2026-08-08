@@ -12,7 +12,20 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('fonts/GoogleSansFlex.ttf') format('truetype-variations'), url('fonts/GoogleSansFlex.ttf') format('truetype');
+  font-weight: 100 1000;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Mozilla Headline';
+  src: url('fonts/MozillaHeadline.ttf') format('truetype-variations'), url('fonts/MozillaHeadline.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+}
 
 :root {
   --bg: #101010;
@@ -40,7 +53,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-family: 'Google Sans Flex', system-ui, sans-serif;
   overflow-x: hidden;
 }
 
@@ -56,7 +69,7 @@ body {
 @keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.pixel { font-family: 'Pixelify Sans', monospace; font-weight: 700; letter-spacing: 0.5px; }
+.pixel { font-family: 'Mozilla Headline', sans-serif; font-weight: 700; letter-spacing: 0.3px; }
 .mono  { font-family: 'IBM Plex Mono', monospace; }
 
 /* ---------- App shell ---------- */
@@ -107,18 +120,12 @@ main {
 
 /* ---------- Section headers ---------- */
 .eyebrow {
-  font-size: 10px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
   margin: 22px 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .eyebrow:first-child { margin-top: 4px; }
-.eyebrow::before { content: ""; width: 10px; height: 10px; background: var(--blue); flex: none; }
-
 /* ---------- Cards ---------- */
 .card {
   background: var(--surface);
@@ -693,7 +700,7 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
   font-size: 9.5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'Google Sans Flex', sans-serif;
   transition: color 0.2s ease;
 }
 .tab svg {
@@ -704,6 +711,229 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 }
 .tab.active { color: var(--gold); }
 .tab.active svg { stroke: var(--gold); transform: scale(1.15); }
+
+/* ================= Game Detail page ================= */
+.gd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+}
+.gd-scroll {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.gd-header {
+  position: relative;
+  padding: calc(var(--safe-t) + 18px) 18px 26px;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: min-height 0.25s ease;
+}
+.gd-header::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: var(--bg-shot);
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(2px) brightness(0.45) saturate(1.05);
+  z-index: 0;
+}
+.gd-header::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(16,16,16,0.55) 0%, rgba(16,16,16,0.75) 55%, var(--bg) 100%);
+  z-index: 0;
+}
+.gd-header > * { position: relative; z-index: 1; }
+.gd-icon-btn {
+  position: absolute;
+  top: calc(var(--safe-t) + 14px);
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(20,20,20,0.55);
+  backdrop-filter: blur(10px);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.gd-icon-btn:active { transform: scale(0.92); }
+.gd-icon-btn svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
+.gd-back { left: 14px; }
+.gd-bookmark { right: 14px; }
+.gd-bookmark.active { background: rgba(127,205,151,0.25); }
+.gd-bookmark.active svg { stroke: var(--green); fill: var(--green); }
+.gd-boxart-wrap { margin-top: 46px; transition: opacity 0.12s linear, transform 0.12s linear; }
+.gd-boxart {
+  max-width: 46%;
+  max-height: 200px;
+  width: auto; height: auto;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+}
+.gd-title { font-size: 21px; font-weight: 700; color: #fff; margin-top: 16px; padding: 0 10px; }
+.gd-devpub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+.gd-meta-row { display: flex; justify-content: center; gap: 28px; margin-top: 22px; width: 100%; }
+.gd-meta { text-align: center; }
+.gd-meta .v { font-size: 15px; font-weight: 700; color: #fff; }
+.gd-meta .icon { font-size: 18px; line-height: 1.3; }
+.gd-meta .l { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+.gd-body { padding: 16px 14px calc(24px + var(--safe-b)); background: var(--bg); }
+
+/* Set / Info / Stats selector reuses .pill-switcher (already rectangular)
+   so it's automatically consistent with the Home switcher's animation
+   while staying visually distinct from the pill-shaped bottom nav. */
+.gd-section { display: none; }
+.gd-section.active { display: block; }
+
+.set-selector-box {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.set-selector-row { display: flex; gap: 8px; overflow-x: auto; flex: 1; }
+.set-tile {
+  flex: none;
+  width: 52px; height: 52px;
+  border-radius: 8px;
+  background: var(--bg) center/cover no-repeat;
+  border: 2px solid transparent;
+  position: relative;
+}
+.set-tile.active { border-color: var(--gold); }
+.set-tile .bar { position: absolute; left: 6px; right: 6px; bottom: -6px; height: 2px; background: var(--gold); border-radius: 2px; }
+.set-config-btn {
+  flex: none;
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--gold-dim);
+  background: none;
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+}
+.set-config-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+.set-info-name { font-size: 15px; font-weight: 700; color: var(--gold); }
+.set-info-line { font-size: 12.5px; color: var(--blue); margin-top: 6px; }
+.set-info-line.mine { color: var(--gold); }
+
+.set-progress-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14px; }
+.set-progress-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); }
+.set-progress-item svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; }
+.set-progress-item.done { color: var(--gold); }
+.set-progress-item.done svg { stroke: var(--gold); fill: var(--gold); }
+.set-progress-divider { width: 1px; height: 18px; background: var(--border); }
+
+.authors-bar {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-top: 14px;
+}
+.authors-bar .sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+
+.gd-controls-row { display: flex; gap: 8px; margin-top: 18px; }
+.gd-sort-select {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 12.5px;
+  border-radius: 10px;
+  padding: 10px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gd-dir-btn {
+  flex: none;
+  width: 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s ease;
+}
+.gd-view-toggle { display: flex; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; flex: none; }
+.gd-view-toggle button { border: none; background: none; padding: 10px 9px; color: var(--text-dim); }
+.gd-view-toggle button.active { background: var(--surface-raised); color: var(--gold); }
+.gd-view-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; display: block; }
+
+.gd-filter-btn {
+  width: 100%;
+  margin-top: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.gd-filter-btn .left { display: flex; align-items: center; gap: 8px; }
+.gd-filter-btn.active { color: var(--red); border-color: var(--red); }
+.gd-filter-btn .count {
+  background: var(--surface-raised);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Achievement cards — reuse .rec-ach-card, add a type icon in the corner */
+.gd-ach-list { margin-top: 18px; }
+.gd-ach-card { position: relative; }
+.gd-type-icon { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; z-index: 1; }
+.gd-type-icon svg { width: 100%; height: 100%; }
+.gd-retropoints { font-size: 10.5px; color: var(--text-muted); }
+
+.gd-scrolltop {
+  position: fixed;
+  right: 16px;
+  bottom: calc(24px + var(--safe-b));
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+.gd-scrolltop.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.gd-scrolltop svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+/* Marquee — for text that would otherwise overflow/clip in a constrained
+   width. Wrap text in <div class="marquee"><span class="marquee-inner">.
+   applyMarquee() checks for real overflow and only then animates. */
+.marquee { overflow: hidden; white-space: nowrap; position: relative; }
+.marquee .marquee-inner { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .marquee.overflowing .marquee-inner {
+    animation: marquee-scroll 7s ease-in-out infinite;
+  }
+}
+@keyframes marquee-scroll {
+  0%, 12% { transform: translateX(0); }
+  50%, 62% { transform: translateX(var(--marquee-shift, 0)); }
+  96%, 100% { transform: translateX(0); }
+}
 
 /* Modal (game detail) */
 .modal-backdrop {
@@ -1625,40 +1855,6 @@ const RA = (() => {
     return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
   }
 
-  // RetroAchievements' own achievement-type color system, used only in
-  // achievement LIST contexts (not on cartridge point badges, which stay
-  // whatever the cart component already renders them as).
-  function achievementTypeColor(type) {
-    const t = (type || "").toLowerCase();
-    if (t === "progression") return "var(--green)";
-    if (t === "win_condition") return "var(--gold)";
-    if (t === "missable") return "var(--red)";
-    return "var(--blue)"; // type: none / general achievement
-  }
-
-  function renderAchievementRows(achievements) {
-    if (!achievements.length) return '<div class="empty-state">No achievements listed.</div>';
-    return achievements
-      .map((a) => {
-        const earned = Boolean(pick(a, "DateEarned"));
-        const t = pick(a, "Title");
-        const d = pick(a, "Description");
-        const pts = pick(a, "Points") ?? 0;
-        const badge = pick(a, "BadgeName");
-        const typeColor = achievementTypeColor(pick(a, "Type"));
-        return `
-        <div class="ach-row">
-          <div class="badge-slot ${earned ? "" : "locked"}" style="background-image:url('${badgeUrl(badge, earned)}')"></div>
-          <div style="flex:1;min-width:0;">
-            <div class="title">${escapeHtml(t)}</div>
-            <div class="desc">${escapeHtml(d)}</div>
-          </div>
-          <span class="pts-pill" style="color:${typeColor};border-color:${typeColor};">${pts}</span>
-        </div>`;
-      })
-      .join("");
-  }
-
   function renderInfoRows(ext) {
     const rows = [
       ["Developer", pick(ext, "Developer")],
@@ -1708,19 +1904,106 @@ const RA = (() => {
     }
   }
 
+  function achievementTypeIcon(type) {
+    const t = (type || "").toLowerCase();
+    if (t === "progression")
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="${"#7fcd97"}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>`;
+    if (t === "win_condition")
+      return `<svg viewBox="0 0 24 24" fill="#cb961b" stroke="none"><polygon points="12 1.5 15.1 8.6 22.8 9.4 17 14.6 18.7 22.2 12 18.3 5.3 22.2 7 14.6 1.2 9.4 8.9 8.6"/></svg>`;
+    if (t === "missable")
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="#c30f16" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="14.5"/><circle cx="12" cy="19" r="1.3" fill="#c30f16" stroke="none"/></svg>`;
+    return "";
+  }
+
+  // Sort modes for the achievement list. Each returns a NEW sorted array;
+  // "dir" flips ascending/descending except for "unlocked", which has no
+  // secondary direction per spec.
+  const GD_SORT_MODES = [
+    { key: "unlocked", label: "Unlocked first", noDirection: true },
+    { key: "display", label: "Display order" },
+    { key: "wonby", label: "Won by" },
+    { key: "points", label: "Points" },
+    { key: "title", label: "Title" },
+    { key: "type", label: "Type" },
+  ];
+  function gdSortAchievements(list, mode, dir) {
+    const arr = list.slice();
+    if (mode === "unlocked") {
+      arr.sort((a, b) => (pick(b, "DateEarned") ? 1 : 0) - (pick(a, "DateEarned") ? 1 : 0));
+      return arr;
+    }
+    if (mode === "display") {
+      arr.sort((a, b) => (pick(a, "DisplayOrder") ?? 0) - (pick(b, "DisplayOrder") ?? 0));
+    } else if (mode === "wonby") {
+      // Approximated: RA doesn't expose a per-achievement "won by" count in
+      // this response, so TrueRatio (which inflates rarer achievements)
+      // stands in as a rarity proxy — lower TrueRatio ≈ more common.
+      arr.sort((a, b) => (pick(a, "TrueRatio") ?? 0) - (pick(b, "TrueRatio") ?? 0));
+    } else if (mode === "points") {
+      arr.sort((a, b) => (pick(b, "Points") ?? 0) - (pick(a, "Points") ?? 0));
+    } else if (mode === "title") {
+      arr.sort((a, b) => (pick(a, "Title") || "").localeCompare(pick(b, "Title") || ""));
+    } else if (mode === "type") {
+      const order = { progression: 0, win_condition: 1, missable: 2, "": 3 };
+      arr.sort((a, b) => {
+        const ta = order[(pick(a, "Type") || "").toLowerCase()] ?? 3;
+        const tb = order[(pick(b, "Type") || "").toLowerCase()] ?? 3;
+        return ta - tb;
+      });
+    }
+    if (dir === -1) arr.reverse();
+    return arr;
+  }
+
+  function gdAchievementCardHTML(a) {
+    const earned = Boolean(pick(a, "DateEarned"));
+    const title = pick(a, "Title");
+    const desc = pick(a, "Description");
+    const pts = pick(a, "Points") ?? 0;
+    const trueRatio = pick(a, "TrueRatio") ?? pts;
+    const badge = pick(a, "BadgeName");
+    const date = pick(a, "DateEarned");
+    const typeIcon = achievementTypeIcon(pick(a, "Type"));
+    return `
+      <div class="card gd-ach-card anim-in">
+        ${typeIcon ? `<div class="gd-type-icon">${typeIcon}</div>` : ""}
+        <div class="rec-ach-card">
+          ${badgeCartHTML({ badgeName: badge, points: pts, earned })}
+          <div class="rec-ach-body">
+            <div class="title">${escapeHtml(title)}</div>
+            ${desc ? `<div class="desc">${escapeHtml(desc)}</div>` : ""}
+            <hr class="dashed-rule">
+            <div class="rec-ach-foot">
+              <span class="gd-retropoints">${trueRatio} RetroPoint${trueRatio === 1 ? "" : "s"}</span>
+              <span>${earned ? `Unlocked • ${escapeHtml(formatReleaseDate(date) || "")}` : "Locked"}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function applyMarquee(root) {
+    (root || document).querySelectorAll(".marquee:not(.marquee-checked)").forEach((el) => {
+      el.classList.add("marquee-checked");
+      const inner = el.querySelector(".marquee-inner");
+      if (!inner) return;
+      if (inner.scrollWidth > el.clientWidth + 2) {
+        el.style.setProperty("--marquee-shift", -(inner.scrollWidth - el.clientWidth) + "px");
+        el.classList.add("overflowing");
+      }
+    });
+  }
+
   async function openGameModal(gameId) {
     const { username } = RA.getSettings();
     const root = $("#modalRoot");
     root.innerHTML = `
-      <div class="modal-backdrop" id="modalBackdrop">
-        <div class="modal-sheet anim-pop">
-          <div class="drag"></div>
-          <div class="spinner"></div>
+      <div class="gd-overlay anim-pop" id="gdOverlay">
+        <div class="gd-scroll" id="gdScroll">
+          <div class="gd-header"><div class="spinner" style="margin-top:120px;"></div></div>
         </div>
       </div>`;
-    $("#modalBackdrop").addEventListener("click", (e) => {
-      if (e.target.id === "modalBackdrop") root.innerHTML = "";
-    });
+    const closeGd = () => (root.innerHTML = "");
 
     try {
       const [progress, ext] = await Promise.all([
@@ -1729,58 +2012,252 @@ const RA = (() => {
       ]);
 
       const title = pick(progress, "Title");
-      const console_ = pick(progress, "ConsoleName");
+      const consoleName = pick(progress, "ConsoleName");
+      const shot = RA.mediaUrl(pick(ext, "ImageIngame") || pick(progress, "ImageIngame") || pick(progress, "ImageTitle"));
+      const boxArt = RA.mediaUrl(pick(ext, "ImageBoxArt") || pick(progress, "ImageBoxArt") || pick(progress, "ImageIcon"));
+      const developer = pick(ext, "Developer");
+      const publisher = pick(ext, "Publisher");
+      const devPub = [developer, publisher].filter(Boolean).join(", ");
+      const released = pick(ext, "Released");
+      const releaseYear = released ? String(released).slice(0, 4) : "—";
+      const players = pick(ext, "NumDistinctPlayers");
+
       const achObj = pick(progress, "Achievements") || {};
-      const achievements = Object.values(achObj).sort((a, b) => {
-        const ea = pick(a, "DateEarned") ? 1 : 0;
-        const eb = pick(b, "DateEarned") ? 1 : 0;
-        return eb - ea;
-      });
+      const allAchievements = Object.values(achObj);
+      const total = allAchievements.length;
+      const earnedCount = allAchievements.filter((a) => pick(a, "DateEarned")).length;
+      const totalPoints = allAchievements.reduce((s, a) => s + (pick(a, "Points") ?? 0), 0);
+      const earnedPoints = allAchievements.filter((a) => pick(a, "DateEarned")).reduce((s, a) => s + (pick(a, "Points") ?? 0), 0);
+      const pct = total ? Math.round((earnedCount / total) * 100) : 0;
 
-      $(".modal-sheet", root).innerHTML = `
-        <div class="drag"></div>
-        <button class="close-x" id="modalClose">✕</button>
-        <div class="eyebrow" style="margin-top:0;">${escapeHtml(console_)}</div>
-        <div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(title)}</div>
-        <div class="seg">
-          <button class="tab-ach active" type="button">Achievements</button>
-          <button class="tab-info" type="button">Info</button>
+      const masteredCount = allAchievements.filter((a) => pick(a, "DateEarnedHardcore")).length;
+      const mastered = total > 0 && masteredCount === total;
+      const winConditions = allAchievements.filter((a) => (pick(a, "Type") || "").toLowerCase() === "win_condition");
+      const beaten = winConditions.length > 0 && winConditions.every((a) => pick(a, "DateEarned"));
+
+      const hasMissable = allAchievements.some((a) => (pick(a, "Type") || "").toLowerCase() === "missable");
+      const authors = Array.from(new Set(allAchievements.map((a) => pick(a, "Author")).filter(Boolean)));
+
+      const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
+
+      const gd = $("#gdScroll");
+      gd.innerHTML = `
+        <div class="gd-header"${bgStyle}>
+          <button class="gd-icon-btn gd-back" id="gdBack" aria-label="Back">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button class="gd-icon-btn gd-bookmark" id="gdBookmark" aria-label="Want to play">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4-6 4V4z"/></svg>
+          </button>
+          <div class="gd-boxart-wrap">
+            <img class="gd-boxart" src="${boxArt}" alt="">
+          </div>
+          <div class="marquee gd-title-marquee" style="width:100%;">
+            <span class="marquee-inner gd-title">${escapeHtml(title)}</span>
+          </div>
+          ${devPub ? `<div class="gd-devpub">${escapeHtml(devPub)}</div>` : ""}
+          <div class="gd-meta-row">
+            <div class="gd-meta"><div class="v">${escapeHtml(releaseYear)}</div><div class="l">Release</div></div>
+            <div class="gd-meta"><div class="icon">🎮</div><div class="l">${escapeHtml(consoleName || "")}</div></div>
+            <div class="gd-meta"><div class="v">${players ? Number(players).toLocaleString() : "—"}</div><div class="l">Players</div></div>
+          </div>
         </div>
-        <div id="paneAch">${renderAchievementRows(achievements)}</div>
-        <div id="paneInfo" style="display:none;">
-          ${renderInfoRows(ext || {})}
-          ${renderHashesAccordion(gameId)}
-        </div>
-      `;
+        <div class="gd-body">
+          <div class="pill-switcher" id="gdSectionSwitcher">
+            <div class="pill-bg" id="gdSectionPillBg"></div>
+            <button class="pill-btn active" data-section="set">Set</button>
+            <button class="pill-btn" data-section="info">Info</button>
+            <button class="pill-btn" data-section="stats">Stats</button>
+          </div>
 
-      $("#modalClose").addEventListener("click", () => (root.innerHTML = ""));
+          <div class="gd-section active" id="gd-section-set">
+            <div class="set-selector-box">
+              <div class="set-selector-row">
+                <div class="set-tile active" style="background-image:url('${RA.mediaUrl(pick(progress, "ImageIcon"))}')">
+                  <div class="bar"></div>
+                </div>
+              </div>
+              <button class="set-config-btn" aria-label="Configure sets">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
+              </button>
+            </div>
 
-      const btnAch = $(".tab-ach", root);
-      const btnInfo = $(".tab-info", root);
-      const paneAch = $("#paneAch", root);
-      const paneInfo = $("#paneInfo", root);
-      btnAch.addEventListener("click", () => {
-        btnAch.classList.add("active");
-        btnInfo.classList.remove("active");
-        paneAch.style.display = "";
-        paneInfo.style.display = "none";
-      });
-      btnInfo.addEventListener("click", () => {
-        btnInfo.classList.add("active");
-        btnAch.classList.remove("active");
-        paneInfo.style.display = "";
-        paneAch.style.display = "none";
-      });
+            <div class="card">
+              <div class="set-info-name">Base Set</div>
+              <div class="set-info-line">${total} achievements worth ${totalPoints} points.</div>
+              <div class="set-info-line mine">Unlocked ${earnedCount} achievement${earnedCount === 1 ? "" : "s"} worth ${earnedPoints} points.</div>
+              <div class="set-progress-row">
+                <div class="set-progress-item ${mastered ? "done" : ""}">
+                  <svg stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L7 22l5-3 5 3-2-7.5"/></svg>
+                  ${pct}%
+                </div>
+                <div class="set-progress-divider"></div>
+                <div class="set-progress-item ${beaten || mastered ? "done" : ""}">
+                  ${
+                    mastered
+                      ? `<svg stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>`
+                      : beaten
+                      ? `<svg stroke-width="2" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>`
+                      : `<svg stroke-width="1.8" stroke-dasharray="2.5 3.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg>`
+                  }
+                  ${mastered ? "Mastered" : beaten ? "Beaten" : "Beaten"}
+                </div>
+              </div>
+            </div>
 
-      const accordion = $("#hashesAccordion", root);
-      accordion.addEventListener("toggle", () => {
-        if (accordion.open && accordion.dataset.loaded === "0") {
-          accordion.dataset.loaded = "1";
-          loadHashesInto(gameId, $("#hashesBody", accordion));
+            ${
+              authors.length
+                ? `<div class="card authors-bar">${authors.length} Author${authors.length === 1 ? "" : "s"}<span class="sub">${escapeHtml(authors.slice(0, 3).join(", "))}</span></div>`
+                : ""
+            }
+
+            <div class="gd-controls-row">
+              <select class="gd-sort-select" id="gdSortSelect">
+                ${GD_SORT_MODES.map((m) => `<option value="${m.key}">${m.label}</option>`).join("")}
+              </select>
+              <button class="gd-dir-btn" id="gdDirBtn" aria-label="Reverse order">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>
+              </button>
+            </div>
+            <div class="gd-view-toggle" style="margin-top:8px;">
+              <button class="active" data-view="achievements">🏆 ${total}</button>
+              <button data-view="speedrun">☰ 0</button>
+            </div>
+            <button class="gd-filter-btn" id="gdFilterBtn">
+              <span class="left">${hasMissable ? "! Missable Only" : "Locked Only"}</span>
+              <span class="count" id="gdFilterCount"></span>
+            </button>
+
+            <div class="gd-ach-list" id="gdAchList"></div>
+          </div>
+
+          <div class="gd-section" id="gd-section-info">
+            ${renderInfoRows(ext || {})}
+            ${renderHashesAccordion(gameId)}
+          </div>
+
+          <div class="gd-section" id="gd-section-stats">
+            <div class="empty-state"><div class="glyph">📊</div>Stats are coming in a later step.</div>
+          </div>
+        </div>`;
+
+      applyMarquee(gd);
+
+      // ---- section switcher (Set / Info / Stats) ----
+      const secButtons = $$(".pill-btn", $("#gdSectionSwitcher"));
+      secButtons.forEach((btn, i) =>
+        btn.addEventListener("click", () => {
+          secButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          $("#gdSectionPillBg").style.transform = `translateX(${i * 100}%)`;
+          $$(".gd-section", gd).forEach((s) => s.classList.remove("active"));
+          $("#gd-section-" + btn.dataset.section, gd).classList.add("active");
+        })
+      );
+
+      // ---- achievements/speedrun toggle ----
+      $$(".gd-view-toggle button", gd).forEach((btn) =>
+        btn.addEventListener("click", () => {
+          $$(".gd-view-toggle button", gd).forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          if (btn.dataset.view === "speedrun") {
+            listEl.innerHTML = `<div class="empty-state"><div class="glyph">⏱️</div>Community speedrun records are coming in a later step.</div>`;
+          } else {
+            renderList();
+          }
+        })
+      );
+
+      // ---- sort + filter + list rendering ----
+      const listEl = $("#gdAchList", gd);
+      let sortMode = "unlocked";
+      let sortDir = 1;
+      let filterActive = true;
+      const filterLabel = hasMissable ? "Missable Only" : "Locked Only";
+
+      function renderList() {
+        let list = allAchievements;
+        if (filterActive) {
+          list = hasMissable
+            ? list.filter((a) => (pick(a, "Type") || "").toLowerCase() === "missable" && !pick(a, "DateEarned"))
+            : list.filter((a) => !pick(a, "DateEarned"));
         }
+        $("#gdFilterCount").textContent = list.length;
+        list = gdSortAchievements(list, sortMode, sortDir);
+        listEl.innerHTML = list.length
+          ? list.map(gdAchievementCardHTML).join("")
+          : `<div class="empty-state"><div class="glyph">🏆</div>Nothing matches this filter.</div>`;
+        applyMarquee(listEl);
+      }
+      renderList();
+
+      $("#gdSortSelect", gd).addEventListener("change", (e) => {
+        sortMode = e.target.value;
+        const mode = GD_SORT_MODES.find((m) => m.key === sortMode);
+        $("#gdDirBtn", gd).style.opacity = mode.noDirection ? "0.35" : "1";
+        renderList();
+      });
+      $("#gdDirBtn", gd).addEventListener("click", () => {
+        const mode = GD_SORT_MODES.find((m) => m.key === sortMode);
+        if (mode.noDirection) return;
+        sortDir *= -1;
+        $("#gdDirBtn", gd).style.transform = sortDir === -1 ? "scaleY(-1)" : "";
+        renderList();
+      });
+      const filterBtn = $("#gdFilterBtn", gd);
+      filterBtn.classList.toggle("active", filterActive);
+      filterBtn.addEventListener("click", () => {
+        filterActive = !filterActive;
+        filterBtn.classList.toggle("active", filterActive);
+        $(".left", filterBtn).textContent = filterActive ? (hasMissable ? "! Missable Only" : "Locked Only") : "All achievements";
+        renderList();
+      });
+
+      // ---- hashes accordion (Info section) ----
+      const accordion = $("#hashesAccordion", gd);
+      if (accordion) {
+        accordion.addEventListener("toggle", () => {
+          if (accordion.open && accordion.dataset.loaded === "0") {
+            accordion.dataset.loaded = "1";
+            loadHashesInto(gameId, $("#hashesBody", accordion));
+          }
+        });
+      }
+
+      // ---- back / bookmark ----
+      $("#gdBack", gd).addEventListener("click", closeGd);
+      $("#gdBookmark", gd).addEventListener("click", (e) => {
+        e.currentTarget.classList.toggle("active");
+      });
+
+      // ---- scroll-to-top button + header collapse ----
+      const scrollTopBtn = document.createElement("button");
+      scrollTopBtn.className = "gd-scrolltop";
+      scrollTopBtn.id = "gdScrollTop";
+      scrollTopBtn.setAttribute("aria-label", "Scroll to top");
+      scrollTopBtn.innerHTML = `<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></svg>`;
+      $("#gdOverlay").appendChild(scrollTopBtn);
+      scrollTopBtn.addEventListener("click", () => gd.scrollTo({ top: 0, behavior: "smooth" }));
+
+      const gdHeader = $(".gd-header", gd);
+      const gdBoxartWrap = $(".gd-boxart-wrap", gd);
+      const COLLAPSE_RANGE = 220;
+      let scrollTicking = false;
+      gd.addEventListener("scroll", () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          const y = gd.scrollTop;
+          scrollTopBtn.classList.toggle("show", y > 400);
+          const progress = Math.min(1, y / COLLAPSE_RANGE);
+          gdHeader.style.minHeight = 480 - progress * 220 + "px";
+          gdBoxartWrap.style.opacity = String(1 - progress * 0.85);
+          gdBoxartWrap.style.transform = `scale(${1 - progress * 0.35}) translateY(${-progress * 20}px)`;
+          scrollTicking = false;
+        });
       });
     } catch (err) {
-      $(".modal-sheet", root).innerHTML = `<div class="drag"></div>${errorBanner(err) || '<div class="empty-state">Couldn\'t load this game.</div>'}`;
+      $("#gdScroll").innerHTML = `<div style="padding:60px 16px;">${errorBanner(err) || '<div class="empty-state">Couldn\'t load this game.</div>'}</div>`;
     }
   }
 
