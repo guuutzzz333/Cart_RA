@@ -732,7 +732,7 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: min-height 0.25s ease;
+  transition: padding 0.12s linear;
 }
 .gd-header::before {
   content: "";
@@ -768,13 +768,14 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 .gd-bookmark { right: 14px; }
 .gd-bookmark.active { background: rgba(127,205,151,0.25); }
 .gd-bookmark.active svg { stroke: var(--green); fill: var(--green); }
-.gd-boxart-wrap { margin-top: 50px; transition: opacity 0.12s linear, transform 0.12s linear; }
+.gd-boxart-wrap { margin-top: 50px; transition: opacity 0.12s linear, margin-top 0.12s linear; }
 .gd-boxart {
   max-width: 52%;
   max-height: 230px;
   width: auto; height: auto;
   border-radius: 8px;
   box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+  transition: max-height 0.12s linear;
 }
 .gd-title { font-size: 24px; font-weight: 700; color: #fff; margin-top: 18px; padding: 0 10px; }
 .gd-devpub { font-size: 13.5px; color: var(--text-muted); margin-top: 5px; }
@@ -855,6 +856,42 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 .gd-type-icon svg { width: 100%; height: 100%; }
 .gd-retropoints { font-size: 10.5px; color: var(--text-muted); }
 
+/* Info tab: image gallery */
+.gd-gallery { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 2px; }
+.gd-gallery img {
+  flex: none;
+  height: 130px;
+  width: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+  background: var(--surface);
+}
+.gd-lightbox {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0,0,0,0.9);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.gd-lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+
+/* Hack / Homebrew title tags */
+.gd-title-tags { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.gd-title-tag {
+  background: #fff;
+  color: #0d0d0d;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+/* Info shelf section labels */
+.gd-subhead { font-size: 12px; font-weight: 700; color: var(--blue); margin: 20px 0 8px; }
+.gd-subhead:first-child { margin-top: 0; }
+
 .gd-scrolltop {
   position: fixed;
   right: 16px;
@@ -919,8 +956,8 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 
 .info-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
 .info-row:last-child { border-bottom: none; }
-.info-row .k { width: 38%; flex: none; color: var(--text-muted); }
-.info-row .v { flex: 1; }
+.info-row .k { width: 38%; flex: none; color: var(--blue); }
+.info-row .v { flex: 1; color: var(--text); }
 
 .accordion { background: var(--surface-raised); border-radius: 8px; margin-top: 16px; overflow: hidden; }
 .accordion summary {
@@ -1861,14 +1898,13 @@ const RA = (() => {
     return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
   }
 
-  function renderInfoRows(ext) {
+  function renderInfoRows(ext, setAuthors) {
     const rows = [
+      ["Set Author", setAuthors && setAuthors.length ? setAuthors.join(", ") : null],
       ["Developer", pick(ext, "Developer")],
       ["Publisher", pick(ext, "Publisher")],
       ["Genre", pick(ext, "Genre")],
       ["Released", formatReleaseDate(pick(ext, "Released"))],
-      ["Players", pick(ext, "NumDistinctPlayers") ? Number(pick(ext, "NumDistinctPlayers")).toLocaleString() : null],
-      ["Achievements", pick(ext, "NumAchievements")],
     ].filter(([, v]) => v !== null && v !== undefined && v !== "");
 
     if (!rows.length) return '<div class="empty-state">No game info available.</div>';
@@ -2043,6 +2079,24 @@ const RA = (() => {
       const beaten = winConditions.length > 0 && winConditions.every((a) => pick(a, "DateEarned"));
 
       const hasMissable = allAchievements.some((a) => (pick(a, "Type") || "").toLowerCase() === "missable");
+      const setAuthors = Array.from(new Set(allAchievements.map((a) => pick(a, "Author")).filter(Boolean)));
+
+      // RA marks hacks/homebrew etc. with "~Tag~" embedded right in the
+      // title string — pull those out into real badges instead of
+      // displaying the tildes as part of the title.
+      const titleTags = Array.from(title.matchAll(/~([^~]+)~/g)).map((m) => m[1].trim());
+      const cleanTitle = title.replace(/~[^~]+~/g, "").replace(/\s+/g, " ").trim();
+
+      // Gallery: whatever distinct artwork RA's API actually exposes for
+      // this game (title screen + in-game shot + box art) — the public
+      // API doesn't expose a broader screenshot gallery beyond these.
+      const galleryImages = Array.from(
+        new Set(
+          [pick(ext, "ImageTitle"), pick(progress, "ImageIngame") || pick(ext, "ImageIngame"), pick(ext, "ImageBoxArt")]
+            .filter(Boolean)
+            .map((p) => RA.mediaUrl(p))
+        )
+      );
 
       const bgStyle = shot ? ` style="--bg-shot:url('${shot}')"` : "";
 
@@ -2059,8 +2113,9 @@ const RA = (() => {
             <img class="gd-boxart" src="${boxArt}" alt="">
           </div>
           <div class="marquee gd-title-marquee" style="width:100%;">
-            <span class="marquee-inner gd-title">${escapeHtml(title)}</span>
+            <span class="marquee-inner gd-title">${escapeHtml(cleanTitle)}</span>
           </div>
+          ${titleTags.length ? `<div class="gd-title-tags">${titleTags.map((t) => `<span class="gd-title-tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
           ${devPub ? `<div class="gd-devpub">${escapeHtml(devPub)}</div>` : ""}
           <div class="gd-meta-row">
             <div class="gd-meta"><div class="v">${escapeHtml(releaseYear)}</div><div class="l">Release</div></div>
@@ -2073,7 +2128,7 @@ const RA = (() => {
             <div class="pill-bg" id="gdSectionPillBg"></div>
             <button class="pill-btn active" data-section="set">Set</button>
             <button class="pill-btn" data-section="info">Info</button>
-            <button class="pill-btn" data-section="stats">Stats</button>
+            <button class="pill-btn" data-section="stats">Community</button>
           </div>
 
           <div class="gd-section active" id="gd-section-set">
@@ -2117,16 +2172,33 @@ const RA = (() => {
           </div>
 
           <div class="gd-section" id="gd-section-info">
-            ${renderInfoRows(ext || {})}
+            ${
+              galleryImages.length
+                ? `<div class="gd-gallery" id="gdGallery">${galleryImages.map((src) => `<img src="${src}" alt="" data-full="${src}">`).join("")}</div>`
+                : ""
+            }
+            <div class="gd-subhead">Info</div>
+            ${renderInfoRows(ext || {}, setAuthors)}
+            <div class="gd-subhead">Essential Resources</div>
             ${renderHashesAccordion(gameId)}
           </div>
 
           <div class="gd-section" id="gd-section-stats">
-            <div class="empty-state"><div class="glyph">📊</div>Stats are coming in a later step.</div>
+            <div class="empty-state"><div class="glyph">💬</div>Personal-vs-community stats and discussion are coming in a later step.</div>
           </div>
-        </div>`;
+        </div>
+        <div id="gdLightboxRoot"></div>`;
 
       applyMarquee(gd);
+
+      // ---- image gallery lightbox ----
+      const lightboxRoot = $("#gdLightboxRoot", gd);
+      $$("#gdGallery img", gd).forEach((img) =>
+        img.addEventListener("click", () => {
+          lightboxRoot.innerHTML = `<div class="gd-lightbox" id="gdLightbox"><img src="${img.dataset.full}" alt=""></div>`;
+          $("#gdLightbox", lightboxRoot).addEventListener("click", () => (lightboxRoot.innerHTML = ""));
+        })
+      );
 
       // ---- section switcher (Set / Info / Stats) ----
       const secButtons = $$(".pill-btn", $("#gdSectionSwitcher"));
@@ -2212,6 +2284,7 @@ const RA = (() => {
 
       const gdHeader = $(".gd-header", gd);
       const gdBoxartWrap = $(".gd-boxart-wrap", gd);
+      const gdBoxart = $(".gd-boxart", gd);
       const COLLAPSE_RANGE = 220;
       let scrollTicking = false;
       gd.addEventListener("scroll", () => {
@@ -2221,9 +2294,16 @@ const RA = (() => {
           const y = gd.scrollTop;
           scrollTopBtn.classList.toggle("show", y > 400);
           const progress = Math.min(1, y / COLLAPSE_RANGE);
-          gdHeader.style.minHeight = 400 - progress * 180 + "px";
+          // Real, layout-affecting shrink — min-height alone did nothing
+          // here because the header's actual content (padding + art +
+          // title + meta row) was already taller than the floor we were
+          // animating, and transform:scale() on the art shrank it
+          // visually without giving that space back to the layout.
+          gdHeader.style.paddingTop = `calc(var(--safe-t) + ${18 - progress * 10}px)`;
+          gdHeader.style.paddingBottom = `${28 - progress * 16}px`;
+          gdBoxartWrap.style.marginTop = `${50 - progress * 36}px`;
+          gdBoxart.style.maxHeight = `${230 - progress * 180}px`;
           gdBoxartWrap.style.opacity = String(1 - progress * 0.85);
-          gdBoxartWrap.style.transform = `scale(${1 - progress * 0.35}) translateY(${-progress * 20}px)`;
           scrollTicking = false;
         });
       });
