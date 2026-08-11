@@ -212,8 +212,6 @@ main {
 }
 .badge-slot.locked { filter: grayscale(1) brightness(0.55); border-color: var(--border); }
 .unlock-meta { min-width: 0; flex: 1; }
-.unlock-meta .title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.unlock-meta .game { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 .unlock-meta .meta-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 11px; }
 .pts-pill {
   font-family: 'IBM Plex Mono', monospace;
@@ -229,7 +227,7 @@ main {
 .game-card:active { background: var(--surface-raised); }
 .game-icon { width: 48px; height: 48px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg) center/cover no-repeat; flex: none; }
 .game-info { flex: 1; min-width: 0; }
-.game-info .title { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.game-info .title { font-size: 13.5px; font-weight: 600; }
 .game-info .console { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
 .xp-bar {
@@ -332,6 +330,7 @@ main {
 .spotlight-card { padding: 16px; cursor: pointer; }
 .spotlight-card:active { background: var(--surface-raised); }
 .spotlight-body { display: flex; gap: 14px; align-items: flex-start; }
+.spotlight-body .badge-cart-icon { width: 60px; height: 60px; }
 .spotlight-title-muted { font-size: 12.5px; color: var(--text-muted); }
 .spotlight-desc-big { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 6px; line-height: 1.35; }
 
@@ -534,13 +533,17 @@ main {
 
 /* Recent Achievements pane */
 .rec-ach-card { display: flex; gap: 12px; align-items: flex-start; }
+.card.rec-ach-card { cursor: pointer; }
+.card.rec-ach-card:active { opacity: 0.85; }
 .rec-ach-card .badge-cart { flex: none; }
 .rec-ach-card .badge-cart-icon { width: 60px; height: 60px; }
 .rec-ach-body { min-width: 0; flex: 1; }
 .rec-ach-body .title { font-size: 14px; font-weight: 700; }
 .rec-ach-body .desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
 .rec-ach-body .dashed-rule { margin: 10px 0 8px; }
-.rec-ach-foot { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; color: var(--text-muted); }
+.rec-ach-foot { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; color: var(--text-muted); gap: 8px; }
+.rec-ach-foot .title-line { min-width: 0; flex: 1; }
+.rec-ach-foot .title-line .gd-title-tag { font-size: 7.5px; padding: 1px 5px; }
 
 /* Rewards pane */
 .reward-category { margin-bottom: 6px; }
@@ -886,7 +889,16 @@ input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
   letter-spacing: 0.4px;
   padding: 3px 9px;
   border-radius: 999px;
+  flex: none;
 }
+.gd-title-tag.sm { font-size: 8.5px; padding: 2px 7px; }
+
+/* Title line — chip(s) + marquee-wrapped title, used everywhere a game
+   title is shown outside the game page/console search. Applied alongside
+   the element's existing semantic class (e.g. class="title title-line"),
+   which still controls font-size/weight/color. */
+.title-line { display: flex; align-items: baseline; gap: 6px; min-width: 0; white-space: normal; }
+.title-line .marquee { min-width: 0; flex: 1; }
 
 /* Info shelf section labels */
 .gd-subhead { font-size: 12px; font-weight: 700; color: var(--blue); margin: 20px 0 8px; }
@@ -1506,7 +1518,8 @@ const RA = (() => {
         .map((g, i) => {
           const gameId = pick(g, "GameID");
           const title = pick(g, "Title");
-          const console_ = pick(g, "ConsoleName");
+          const console_ = consoleAbbrev(pick(g, "ConsoleName"));
+          const consoleId = pick(g, "ConsoleID");
           const icon = RA.mediaUrl(pick(g, "ImageIcon"));
           const lastPlayed = pick(g, "LastPlayed");
           return `
@@ -1514,8 +1527,8 @@ const RA = (() => {
             <div class="media-header">
               <div class="game-icon" style="background-image:url('${icon}')"></div>
               <div class="game-info">
-                <div class="console">${escapeHtml(console_)}</div>
-                <div class="title">${escapeHtml(title)}</div>
+                <div class="console-line">${consoleGlyphHTML(consoleId, 14)} ${escapeHtml(console_)}</div>
+                <div class="title title-line">${gameTitleLineHTML(title)}</div>
               </div>
             </div>
             <hr class="dashed-rule">
@@ -1523,6 +1536,7 @@ const RA = (() => {
           </div>`;
         })
         .join("");
+      applyMarquee(el);
       $$(".played-card", el).forEach((card) =>
         card.addEventListener("click", () => openGameModal(card.dataset.gameid))
       );
@@ -1551,21 +1565,26 @@ const RA = (() => {
           const pts = pick(a, "Points") ?? 0;
           const badge = pick(a, "BadgeName");
           const date = pick(a, "Date", "DateEarned");
+          const gameId = pick(a, "GameID");
           return `
-          <div class="card rec-ach-card anim-in" style="animation-delay:${i * 20}ms">
+          <div class="card rec-ach-card anim-in" style="animation-delay:${i * 20}ms" ${gameId ? `data-gameid="${gameId}"` : ""}>
             ${badgeCartHTML({ badgeName: badge, points: pts, earned: true })}
             <div class="rec-ach-body">
-              <div class="title">${escapeHtml(title)}</div>
+              <div class="title title-line">${marqueeTextHTML(title)}</div>
               ${desc ? `<div class="desc">${escapeHtml(desc)}</div>` : ""}
               <hr class="dashed-rule">
               <div class="rec-ach-foot">
-                <span>${escapeHtml(game)}</span>
+                <span class="title-line">${gameTitleLineHTML(game)}</span>
                 <span>${escapeHtml(timeAgo(date))}</span>
               </div>
             </div>
           </div>`;
         })
         .join("");
+      $$(".rec-ach-card", el).forEach((card) => {
+        if (card.dataset.gameid) card.addEventListener("click", () => openGameModal(card.dataset.gameid));
+      });
+      applyMarquee(el);
       if (recent.length > RECENT_CAP) {
         el.insertAdjacentHTML(
           "beforeend",
@@ -1719,7 +1738,7 @@ const RA = (() => {
           <div class="game-icon" style="background-image:url('${icon}')"></div>
           <div class="game-info">
             <div class="console-line">${consoleGlyphHTML(consoleId, 14)} ${escapeHtml(console_)}</div>
-            <div class="title">${escapeHtml(title)}</div>
+            <div class="title title-line">${gameTitleLineHTML(title)}</div>
             ${rp ? `<div class="rp-msg">${escapeHtml(rp)}</div>` : ""}
           </div>
         </div>
@@ -1729,6 +1748,7 @@ const RA = (() => {
           <span class="stat-pct">${pct}%</span>
         </div>
       </div>`;
+    applyMarquee($("#nowPlayingSlot"));
     $(".now-playing", $("#nowPlayingSlot")).addEventListener("click", (e) =>
       openGameModal(e.currentTarget.dataset.gameid)
     );
@@ -1754,15 +1774,18 @@ const RA = (() => {
     const pts = pick(ach, "Points") ?? 0;
     const gameId = pick(game, "ID");
     const gameTitle = pick(game, "Title") || "";
-    const consoleTitle = pick(pick(aotw, "Console"), "Title") || "";
 
     let badge = null;
     let alreadyEarned = false;
     let shot = "";
     let gameIcon = "";
+    let consoleId = null;
+    let consoleAbbr = "";
     if (fullGame) {
       shot = RA.mediaUrl(pick(fullGame, "ImageIngame") || pick(fullGame, "ImageTitle"));
       gameIcon = RA.mediaUrl(pick(fullGame, "ImageIcon"));
+      consoleId = pick(fullGame, "ConsoleID");
+      consoleAbbr = consoleAbbrev(pick(fullGame, "ConsoleName"));
       const achObj = pick(fullGame, "Achievements") || {};
       const match = achObj[achId] || Object.values(achObj).find((a) => String(pick(a, "ID")) === achId);
       if (match) {
@@ -1791,21 +1814,22 @@ const RA = (() => {
         <div class="media-header">
           <div class="game-icon" style="background-image:url('${gameIcon}')"></div>
           <div class="game-info">
-            <div class="console">${escapeHtml(consoleTitle)}</div>
-            <div class="title">${escapeHtml(gameTitle)}</div>
+            <div class="console-line">${consoleGlyphHTML(consoleId, 14)} ${escapeHtml(consoleAbbr)}</div>
+            <div class="title title-line">${gameTitleLineHTML(gameTitle)}</div>
           </div>
         </div>
         <hr class="dashed-rule">
         <div class="spotlight-body">
           ${badgeCartHTML({ badgeName: badge, points: pts, earned: true })}
           <div class="unlock-meta">
-            <div class="spotlight-title-muted">${escapeHtml(title)}</div>
+            <div class="spotlight-title-muted title-line">${marqueeTextHTML(title)}</div>
             ${desc ? `<div class="spotlight-desc-big">${escapeHtml(desc)}</div>` : ""}
             ${alreadyEarned ? `<div class="confirm-text" style="margin-top:8px;">✓ you've got this one</div>` : ""}
           </div>
         </div>
       </div>`;
 
+    applyMarquee(el);
     if (gameId) {
       $(".spotlight-card", el).addEventListener("click", () => openGameModal(gameId));
     }
@@ -1857,7 +1881,8 @@ const RA = (() => {
       el.innerHTML = results
         .map((g, i) => {
           const title = pick(g, "Title");
-          const console_ = pick(g, "ConsoleName");
+          const console_ = consoleAbbrev(pick(g, "ConsoleName"));
+          const consoleId = pick(g, "ConsoleID");
           const icon = RA.mediaUrl(pick(g, "ImageIcon"));
           const max = pick(g, "MaxPossible") || 0;
           const got = pick(g, "NumAwarded") || 0;
@@ -1874,14 +1899,15 @@ const RA = (() => {
           <div class="card game-card anim-in" style="animation-delay:${i * 20}ms" data-gameid="${gameId}">
             <div class="game-icon ${frameClass}" style="background-image:url('${icon}')"></div>
             <div class="game-info">
-              <div class="title">${escapeHtml(title)}</div>
-              <div class="console">${escapeHtml(console_)}</div>
+              <div class="title title-line">${gameTitleLineHTML(title)}</div>
+              <div class="console-line">${consoleGlyphHTML(consoleId, 12)} ${escapeHtml(console_)}</div>
               <div class="xp-bar"><div class="fill ${complete ? "complete" : ""}" style="width:${pct}%"></div></div>
               <div class="pct">${got}/${max} · ${pct}%</div>
             </div>
           </div>`;
         })
         .join("");
+      applyMarquee(el);
 
       $$(".game-card", el).forEach((card) =>
         card.addEventListener("click", () => openGameModal(card.dataset.gameid))
@@ -2022,6 +2048,31 @@ const RA = (() => {
           </div>
         </div>
       </div>`;
+  }
+
+  // RA marks hacks/homebrew/etc. with "~Tag~" embedded right in the title
+  // string. Pull those into real chips instead of leaving the tildes in
+  // the displayed text — used everywhere a game title is shown, not just
+  // the game page.
+  function parseTitleTags(title) {
+    const tags = Array.from((title || "").matchAll(/~([^~]+)~/g)).map((m) => m[1].trim());
+    const clean = (title || "").replace(/~[^~]+~/g, "").replace(/\s+/g, " ").trim();
+    return { clean, tags };
+  }
+  function titleTagChips(tags, small) {
+    if (!tags.length) return "";
+    return tags.map((t) => `<span class="gd-title-tag${small ? " sm" : ""}">${escapeHtml(t)}</span>`).join("");
+  }
+  // A game title as [tag chips][marquee-wrapped clean title] — replaces a
+  // plain escapeHtml(title) anywhere a game name is shown outside the
+  // game page/console search (which keep the full untouched title).
+  function gameTitleLineHTML(rawTitle) {
+    const { clean, tags } = parseTitleTags(rawTitle);
+    return `${titleTagChips(tags, true)}<span class="marquee"><span class="marquee-inner">${escapeHtml(clean)}</span></span>`;
+  }
+  // Plain marquee wrap for text with no tag concept (achievement titles).
+  function marqueeTextHTML(text) {
+    return `<span class="marquee"><span class="marquee-inner">${escapeHtml(text)}</span></span>`;
   }
 
   function applyMarquee(root) {
